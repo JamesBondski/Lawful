@@ -7,15 +7,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="www\assets\index-96OH9mnB.js" />
-	  <None Remove="www\assets\index-DdiqUGQG.css" />
+	  <None Remove="www\assets\index.css" />
+	  <None Remove="www\assets\index.js" />
 	  <None Remove="www\favicon.ico" />
 	  <None Remove="www\index.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="www\assets\index-96OH9mnB.js" />
-	  <EmbeddedResource Include="www\assets\index-DdiqUGQG.css" />
+	  <EmbeddedResource Include="www\assets\index.css" />
+	  <EmbeddedResource Include="www\assets\index.js" />
 	  <EmbeddedResource Include="www\favicon.ico" />
 	  <EmbeddedResource Include="www\index.html" />
 	</ItemGroup>

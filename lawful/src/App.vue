@@ -1,15 +1,29 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const laws = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/v1/lawful/laws')
+    laws.value = response.data
+  } catch (error) {
+    console.error('Error fetching laws:', error)
+  }
+})
+
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+    <select v-if="laws.length > 0">
+      <option v-for="law in laws" :key="law" :value="law">{{ law }}</option>
+    </select>
+    <p v-else>No laws available</p>
   </header>
 
   <main>
