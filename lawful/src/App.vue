@@ -1,33 +1,69 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 
-const laws = ref([])
+interface Law {
+  Id: string | number;
+  Name: string;
+}
+
+interface Section {
+  Title: string;
+}
+
+const laws = ref<Law[]>([])
+const selectedLawId = ref<string | number | null>(null)
+const sections = ref<Section[]>([])
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/v1/lawful/laws')
+    const response = await axios.get('/api/v1/lawful/law')
     laws.value = response.data
   } catch (error) {
     console.error('Error fetching laws:', error)
   }
 })
 
+const fetchSections = async (id: string | number) => {
+  try {
+    const response = await axios.get(`/api/v1/lawful/section?id=${id}`)
+    sections.value = response.data
+  } catch (error) {
+    console.error('Error fetching sections:', error)
+    sections.value = []
+  }
+}
+
+watch(selectedLawId, (newId) => {
+  if (newId) {
+    fetchSections(newId)
+  } else {
+    sections.value = []
+  }
+})
 </script>
 
 <template>
   <header>
-    <select v-if="laws.length > 0">
-      <option v-for="law in laws" :key="law" :value="law">{{ law }}</option>
+    <select v-if="laws.length > 0" v-model="selectedLawId">
+      <option value="">Select a law</option>
+      <option v-for="law in laws" :key="law.Id" :value="law.Id">{{ law.Name }}</option>
     </select>
     <p v-else>No laws available</p>
   </header>
 
   <main>
-    <TheWelcome />
+    {{ selectedLawId }}
+    <div v-if="sections.length > 0">
+      <h2>Sections:</h2>
+      <ul>
+        <li v-for="(section, index) in sections" :key="index">
+          {{ section.Title }}
+        </li>
+      </ul>
+    </div>
+    <p v-else-if="selectedLawId">Loading sections...</p>
+    <p v-else>Select a law to view its sections</p>
   </main>
 </template>
 

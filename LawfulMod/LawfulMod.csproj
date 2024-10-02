@@ -14,14 +14,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="www\assets\index.css" />
-	  <EmbeddedResource Include="www\assets\index.js" />
-	  <EmbeddedResource Include="www\favicon.ico" />
-	  <EmbeddedResource Include="www\index.html" />
+	  <EmbeddedResource Include="www\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="EcoCivicsImportExportMod\EcoCivicsImportExportMod\CivicsImpExpPlugin.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NetFabric.Hyperlinq.Abstractions" Version="1.3.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,32 +1,71 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
-using Eco.Gameplay.Civics.Misc;
-using Eco.Gameplay.Objects;
+using Eco.Mods.CivicsImpExp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace LawfulMod.API
 {
     [Route("api/v1/lawful")]
     public class CivicsController : Controller
     {
-        [HttpGet("laws")]
-        [AllowAnonymous]
-        public int[] GetStrings()
-        {
-            return Registrars.Get<Law>().All().Select(l => l.Id).ToArray();
-        }
+        public record SectionDto(string Title);
 
         [HttpGet("section")]
         [AllowAnonymous]
-        public string[] GetSections(int lawId)
+        public SectionDto[] GetSection(int id)
         {
-            return Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId)?.Sections.Select(s => s.Title).ToArray() ?? Array.Empty<string>();
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == id);
+            if (law != null)
+            {
+                return law.Sections.Select(s => new SectionDto(s.Title)).ToArray();
+            }
+            else
+            {
+                return new SectionDto[0];
+            }
+        }
+
+        public record LawDto(int Id, string Name);
+
+        [HttpGet("law")]
+        [AllowAnonymous]
+        public LawDto[] GetLaws()
+        {
+            var laws = Registrars.Get<Law>().All();
+            return laws.Select(l => new LawDto(l.Id, l.Name)).ToArray();
+        }
+
+        [HttpGet("json")]
+        [AllowAnonymous]
+        public string SerializeLaw(int Id)
+        {
+
+           var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == Id);
+            if (law != null)
+            {
+                return JsonConvert.SerializeObject(law, Formatting.Indented, new CivicsJsonConverter());
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        [HttpGet("sectionjson")]
+        [AllowAnonymous]
+        public string GetSectionJSON(int id)
+        {
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == id);
+            if (law != null)
+            {
+                return JsonConvert.SerializeObject(law.Sections.First(), Formatting.Indented, new CivicsJsonConverter());
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }
