@@ -19,7 +19,6 @@ namespace LawfulMod.API
         [AllowAnonymous]
         public int[] GetStrings()
         {
-            CivicsUtils.
             return Registrars.Get<Law>().All().Select(l => l.Id).ToArray();
         }
 
