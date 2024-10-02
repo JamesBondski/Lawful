@@ -7,10 +7,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="www\assets\index-96OH9mnB.js" />
+	  <None Remove="www\assets\index-DdiqUGQG.css" />
+	  <None Remove="www\favicon.ico" />
 	  <None Remove="www\index.html" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="www\assets\index-96OH9mnB.js" />
+	  <EmbeddedResource Include="www\assets\index-DdiqUGQG.css" />
+	  <EmbeddedResource Include="www\favicon.ico" />
 	  <EmbeddedResource Include="www\index.html" />
 	</ItemGroup>
 
@@ -41,6 +47,10 @@
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 	  <Exec Command="copy bin\$(Configuration)\net7.0\$(MSBuildProjectName).dll $(ECO_SERVER_PATH)\Mods&#xD;&#xA;copy bin\$(Configuration)\net7.0\$(MSBuildProjectName).pdb $(ECO_SERVER_PATH)\Mods" />
+	</Target>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="call prebuild.bat" />
 	</Target>
 
 </Project>
