@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="www\index.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="www\index.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Eco.Core">
+			<HintPath>..\eco-dlls\Eco.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Eco.Gameplay">
+			<HintPath>..\eco-dlls\Eco.Gameplay.dll</HintPath>
+		</Reference>
+		<Reference Include="Eco.ModKit">
+			<HintPath>..\eco-dlls\Eco.ModKit.dll</HintPath>
+		</Reference>
+		<Reference Include="Eco.Plugins">
+			<HintPath>..\eco-dlls\Eco.Plugins.dll</HintPath>
+		</Reference>
+		<Reference Include="Eco.Shared">
+			<HintPath>..\eco-dlls\Eco.Shared.dll</HintPath>
+		</Reference>
+		<Reference Include="Eco.Shared">
+			<HintPath>..\eco-dlls\Eco.WebServer.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>
