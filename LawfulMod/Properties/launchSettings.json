@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Profil \"1\"": {
+      "commandName": "Executable",
+      "executablePath": "$(ECO_SERVER_PATH)\\EcoServer.exe",
+      "workingDirectory": "$(ECO_SERVER_PATH)"
+    }
+  }
+}
