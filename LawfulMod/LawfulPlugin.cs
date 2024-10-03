@@ -3,10 +3,11 @@ using Eco.Core.Utils;
 using Eco.Shared.Logging;
 using Eco.Shared.Localization;
 using LiteDB;
+using System;
 
 namespace LawfulMod
 {
-    public class LawfulPlugin : IInitializablePlugin, IModKitPlugin, IWebPlugin
+    public class LawfulPlugin : IInitializablePlugin, IModKitPlugin, IWebPlugin, IShutdownablePlugin
     {
         LiteDatabase? db = null;
 
@@ -49,9 +50,18 @@ namespace LawfulMod
         {
             Log.WriteLine(new LocString("LawfulPlugin initialized"));
 
-            if(File.Exists("lawful.db"))
+            db = new LiteDatabase("Mods\\lawful.db");
+            if(db.GetCollection<LawfulConfig>().Count() == 0)
             {
-                db = new LiteDatabase("lawful.db");
+                db.GetCollection<LawfulConfig>().Insert(new LawfulConfig());
+            }
+        }
+
+        public async Task ShutdownAsync()
+        {
+            if(db != null)
+            {
+                await Task.Run(() => db.Dispose());
             }
         }
     }
