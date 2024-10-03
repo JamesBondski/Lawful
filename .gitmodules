@@ -1,0 +1,3 @@
+[submodule "LawfulMod/EcoCivicsImportExportMod"]
+	path = LawfulMod/EcoCivicsImportExportMod
+	url = https://github.com/JamesBondski/EcoCivicsImportExportMod.git

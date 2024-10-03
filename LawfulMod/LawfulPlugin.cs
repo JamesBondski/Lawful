@@ -2,11 +2,14 @@
 using Eco.Core.Utils;
 using Eco.Shared.Logging;
 using Eco.Shared.Localization;
+using LiteDB;
 
 namespace LawfulMod
 {
     public class LawfulPlugin : IInitializablePlugin, IModKitPlugin, IWebPlugin
     {
+        LiteDatabase? db = null;
+
         public string GetCategory()
         {
             return "Civics";
@@ -45,6 +48,11 @@ namespace LawfulMod
         public void Initialize(TimedTask timer)
         {
             Log.WriteLine(new LocString("LawfulPlugin initialized"));
+
+            if(File.Exists("lawful.db"))
+            {
+                db = new LiteDatabase("lawful.db");
+            }
         }
     }
 }

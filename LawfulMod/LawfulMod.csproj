@@ -18,14 +18,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Remove="EcoCivicsImportExportMod\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <None Include="EcoCivicsImportExportMod\EcoCivicsImportExportMod\CivicsImpExpPlugin.cs" />
+		<Compile Remove="EcoCivicsImportExportMod\EcoCivicsImportExportMod.Bundler\**" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="LiteDB" Version="5.0.21" />
 	  <PackageReference Include="NetFabric.Hyperlinq.Abstractions" Version="1.3.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
