@@ -1,6 +1,7 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
 using Eco.Mods.LawfulMod.CivicsImpExp;
+using LiteDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ namespace LawfulMod.API
     [Route("api/v1/lawful")]
     public class CivicsController : Controller
     {
-        public record SectionDto(string Title);
+        public record SectionDto(int Index, string Title);
 
         [HttpGet("section")]
         [AllowAnonymous]
@@ -19,7 +20,8 @@ namespace LawfulMod.API
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == id);
             if (law != null)
             {
-                return law.Sections.Select(s => new SectionDto(s.Title)).ToArray();
+                int index = 0;
+                return law.Sections.Select(s => new SectionDto(index++, s.Title)).ToArray();
             }
             else
             {
@@ -37,21 +39,51 @@ namespace LawfulMod.API
             return laws.Select(l => new LawDto(l.Id, l.Name)).ToArray();
         }
 
-        [HttpGet("json")]
+        [HttpPost("store")]
         [AllowAnonymous]
-        public string SerializeLaw(int Id)
+        public string StoreSection(int lawId, int sectionIndex)
         {
-
-           var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == Id);
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                return JsonConvert.SerializeObject(law, Formatting.Indented, new CivicsJsonConverter());
+                var section = law.Sections[sectionIndex];
+                var json = JsonConvert.SerializeObject(section, Formatting.Indented, new CivicsJsonConverter());
+
+                var sectionDoc = new BsonDocument();
+                sectionDoc["lawId"] = lawId;
+                sectionDoc["sectionIndex"] = sectionIndex;
+                sectionDoc["json"] = json;
+                var id = LawfulPlugin.Obj.Db?.GetCollection("sections").Insert(sectionDoc);
+                return id.ToString();
             }
             else
             {
                 return "";
             }
         }
+
+        [HttpGet("json")]
+        [AllowAnonymous]
+        public string SerializeLaw(int Id)
+        {
+
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == Id);
+            if (law != null)
+            {
+                var json = JsonConvert.SerializeObject(law, Formatting.Indented, new CivicsJsonConverter());
+
+                var lawDoc = new BsonDocument();
+                lawDoc["id"] = law.Id;
+                lawDoc["json"] = json;
+                LawfulPlugin.Obj.Db?.GetCollection("laws").Insert(lawDoc);
+                return json;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
 
         [HttpGet("sectionjson")]
         [AllowAnonymous]

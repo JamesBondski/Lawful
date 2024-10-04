@@ -4,12 +4,15 @@ using Eco.Shared.Logging;
 using Eco.Shared.Localization;
 using LiteDB;
 using System;
+using Eco.Shared.Utils;
 
 namespace LawfulMod
 {
-    public class LawfulPlugin : IInitializablePlugin, IModKitPlugin, IWebPlugin, IShutdownablePlugin
+    public class LawfulPlugin : Singleton<LawfulPlugin>, IInitializablePlugin, IModKitPlugin, IWebPlugin, IShutdownablePlugin
     {
         LiteDatabase? db = null;
+
+        public LiteDatabase? Db => db;
 
         public string GetCategory()
         {

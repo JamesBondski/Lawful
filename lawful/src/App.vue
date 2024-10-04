@@ -3,16 +3,17 @@ import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 
 interface Law {
-  Id: string | number;
+  Id: number;
   Name: string;
 }
 
 interface Section {
+  Index: number;
   Title: string;
 }
 
 const laws = ref<Law[]>([])
-const selectedLawId = ref<string | number | null>(null)
+const selectedLawId = ref<number | null>(null)
 const sections = ref<Section[]>([])
 
 onMounted(async () => {
@@ -31,6 +32,22 @@ const fetchSections = async (id: string | number) => {
   } catch (error) {
     console.error('Error fetching sections:', error)
     sections.value = []
+  }
+}
+
+const storeSection = async (lawId: number, sectionIndex: number) => {
+  try {
+    const response = await axios.post('/api/v1/lawful/store', null, {
+      params: {
+        lawId,
+        sectionIndex
+      }
+    })
+    console.log('Section stored successfully:', response.data)
+    // You can add additional logic here, such as showing a success message to the user
+  } catch (error) {
+    console.error('Error storing section:', error)
+    // You can add error handling logic here, such as showing an error message to the user
   }
 }
 
@@ -59,6 +76,7 @@ watch(selectedLawId, (newId) => {
       <ul>
         <li v-for="(section, index) in sections" :key="index">
           {{ section.Title }}
+          <button @click="storeSection(Number(selectedLawId), section.Index)">Store</button>
         </li>
       </ul>
     </div>
