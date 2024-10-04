@@ -367,5 +367,4 @@ eco-dlls/*.dll
 eco-dlls/*.xml
 
 #built js and css files
-LawfulMod/www/assets/index.js
-LawfulMod/www/assets/index.css
+LawfulMod/www/assets/*.*

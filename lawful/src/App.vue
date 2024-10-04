@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
+import { VBtn, VCard, VCardItem, VCardTitle, VCardActions } from 'vuetify/components'
 
 interface Law {
   Id: number;
@@ -62,10 +63,14 @@ watch(selectedLawId, (newId) => {
 
 <template>
   <header>
-    <select v-if="laws.length > 0" v-model="selectedLawId">
-      <option value="">Select a law</option>
-      <option v-for="law in laws" :key="law.Id" :value="law.Id">{{ law.Name }}</option>
-    </select>
+    <v-select
+      v-if="laws.length > 0"
+      v-model="selectedLawId"
+      :items="laws"
+      item-title="Name"
+      item-value="Id"
+      label="Select a law"
+    ></v-select>
     <p v-else>No laws available</p>
   </header>
 
@@ -73,12 +78,12 @@ watch(selectedLawId, (newId) => {
     {{ selectedLawId }}
     <div v-if="sections.length > 0">
       <h2>Sections:</h2>
-      <ul>
-        <li v-for="(section, index) in sections" :key="index">
-          {{ section.Title }}
-          <button @click="storeSection(Number(selectedLawId), section.Index)">Store</button>
-        </li>
-      </ul>
+        <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
+          <v-card-title>{{ section.Title }}</v-card-title>
+          <v-card-actions>
+            <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
+          </v-card-actions>
+        </v-card>
     </div>
     <p v-else-if="selectedLawId">Loading sections...</p>
     <p v-else>Select a law to view its sections</p>

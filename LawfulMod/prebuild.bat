@@ -1,4 +1,5 @@
 md www\assets
+del www\assets\*.* /Y
 cd ..
 cd lawful
 call npm run build
