@@ -11,26 +11,6 @@ namespace LawfulMod.API
     [Route("api/v1/lawful")]
     public class CivicsController : Controller
     {
-        public record SectionDto(int Index, string Title);
-
-        [HttpGet("section")]
-        [AllowAnonymous]
-        public SectionDto[] GetSection(int id)
-        {
-            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == id);
-            if (law != null)
-            {
-                int index = 0;
-                return law.Sections.Select(s => new SectionDto(index++, s.Title)).ToArray();
-            }
-            else
-            {
-                return new SectionDto[0];
-            }
-        }
-
-        
-
         [HttpPost("store")]
         [AllowAnonymous]
         public string StoreSection(int lawId, int sectionIndex)

@@ -13,14 +13,17 @@ interface LawDto {
   HostObject: string;
 }
 
-interface Section {
+interface SectionDto {
+  LawId: number;
   Index: number;
   Title: string;
+  Description: string;
+  UserDescription: string;
 }
 
 const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
-const sections = ref<Section[]>([])
+const sections = ref<SectionDto[]>([])
 
 onMounted(async () => {
   try {
@@ -33,7 +36,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/section?id=${id}`)
+    const response = await axios.get(`/api/v1/lawful/section?lawId=${id}`)
     sections.value = response.data
   } catch (error) {
     console.error('Error fetching sections:', error)
@@ -85,6 +88,8 @@ watch(selectedLawId, (newId) => {
       <h2>Sections:</h2>
         <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
           <v-card-title>{{ section.Title }}</v-card-title>
+          <v-card-text>{{ section.Description }}</v-card-text>
+          <v-card-text>{{ section.UserDescription }}</v-card-text>
           <v-card-actions>
             <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
           </v-card-actions>
