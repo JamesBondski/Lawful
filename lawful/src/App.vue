@@ -3,9 +3,14 @@ import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { VBtn, VCard, VCardItem, VCardTitle, VCardActions } from 'vuetify/components'
 
-interface Law {
+interface LawDto {
   Id: number;
-  Name: string;
+  Title: string;
+  Description: string;
+  Creator: string;
+  State: string;
+  Settlement: string;
+  HostObject: string;
 }
 
 interface Section {
@@ -13,7 +18,7 @@ interface Section {
   Title: string;
 }
 
-const laws = ref<Law[]>([])
+const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
 const sections = ref<Section[]>([])
 
@@ -67,7 +72,7 @@ watch(selectedLawId, (newId) => {
       v-if="laws.length > 0"
       v-model="selectedLawId"
       :items="laws"
-      item-title="Name"
+      item-title="Title"
       item-value="Id"
       label="Select a law"
     ></v-select>

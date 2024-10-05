@@ -29,15 +29,7 @@ namespace LawfulMod.API
             }
         }
 
-        public record LawDto(int Id, string Name);
-
-        [HttpGet("law")]
-        [AllowAnonymous]
-        public LawDto[] GetLaws()
-        {
-            var laws = Registrars.Get<Law>().All();
-            return laws.Select(l => new LawDto(l.Id, l.Name)).ToArray();
-        }
+        
 
         [HttpPost("store")]
         [AllowAnonymous]
@@ -48,7 +40,6 @@ namespace LawfulMod.API
             {
                 var section = law.Sections[sectionIndex];
                 var json = JsonConvert.SerializeObject(section, Formatting.Indented, new CivicsJsonConverter());
-
                 var sectionDoc = new BsonDocument();
                 sectionDoc["lawId"] = lawId;
                 sectionDoc["sectionIndex"] = sectionIndex;
