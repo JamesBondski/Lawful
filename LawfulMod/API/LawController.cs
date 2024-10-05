@@ -41,7 +41,7 @@ namespace LawfulMod.API
 
         private LawDto GetDto(Law law)
         {
-            return new LawDto(law.Id, law.Name, TextUtils.StripTags(law.Description()), law.Creator.Name, law.State.ToString(), law.Settlement.Name, law.HostObject.Object.Name);
+            return new LawDto(law.Id, law.Name, law.UserDescription, law.Creator.Name, law.State.ToString(), law.Settlement.Name, law.HostObject.Object.Name);
         }
     }
 }
