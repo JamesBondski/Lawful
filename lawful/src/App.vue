@@ -63,6 +63,8 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
     })
     console.log('Section stored successfully:', response.data)
     // You can add additional logic here, such as showing a success message to the user
+
+    fetchStoredSections();
   } catch (error) {
     console.error('Error storing section:', error)
     // You can add error handling logic here, such as showing an error message to the user
@@ -104,7 +106,7 @@ watch(selectedLawId, (newId) => {
         </header>
 
         <main>
-          {{ selectedLawId }}
+          <h1>Current Laws</h1>
           <div v-if="sections.length > 0">
             <h2>Sections:</h2>
               <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
