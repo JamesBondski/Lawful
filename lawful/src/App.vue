@@ -115,34 +115,24 @@ watch(selectedLawId, (newId) => {
   <v-container>
     <v-row>
       <v-col cols="6">
-        <header>
-          <h1>Current Laws</h1>
-          <v-select
-            v-if="laws.length > 0"
-            v-model="selectedLawId"
-            :items="laws"
-            item-title="Title"
-            item-value="Id"
-            label="Select a law"
-          ></v-select>
-          <p v-else>No laws available</p>
-        </header>
+        <h1>Current Laws</h1>
+        <v-select v-if="laws.length > 0" v-model="selectedLawId" :items="laws" item-title="Title" item-value="Id"
+          label="Select a law"></v-select>
+        <p v-else>No laws available</p>
 
-        <main>
-          <div v-if="sections.length > 0">
-            <h2>Sections:</h2>
-              <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
-                <v-card-title>{{ section.Title }}</v-card-title>
-                <v-card-text>{{ section.Description }}</v-card-text>
-                <v-card-text>{{ section.UserDescription }}</v-card-text>
-                <v-card-actions>
-                  <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
-                </v-card-actions>
-              </v-card>
-          </div>
-          <p v-else-if="selectedLawId">Loading sections...</p>
-          <p v-else>Select a law to view its sections</p>
-        </main>
+        <div v-if="sections.length > 0">
+          <h2>Sections:</h2>
+          <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
+            <v-card-title>{{ section.Title }}</v-card-title>
+            <v-card-text>{{ section.Description }}</v-card-text>
+            <v-card-text>{{ section.UserDescription }}</v-card-text>
+            <v-card-actions>
+              <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
+            </v-card-actions>
+          </v-card>
+        </div>
+        <p v-else-if="selectedLawId">Loading sections...</p>
+        <p v-else>Select a law to view its sections</p>
       </v-col>
       <v-col cols="6">
         <h1>Stored Sections</h1>
@@ -164,30 +154,5 @@ watch(selectedLawId, (newId) => {
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-}
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
