@@ -21,14 +21,23 @@ interface SectionDto {
   UserDescription: string;
 }
 
+interface StoredSectionDto {
+  Id: string;
+  Title: string;
+  Description: string;
+  UserDescription: string;
+}
+
 const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
 const sections = ref<SectionDto[]>([])
+const storedSections = ref<StoredSectionDto[]>([]) // New reactive variable for stored sections
 
 onMounted(async () => {
   try {
     const response = await axios.get('/api/v1/lawful/law')
     laws.value = response.data
+    await fetchStoredSections(); // Fetch stored sections on mount
   } catch (error) {
     console.error('Error fetching laws:', error)
   }
@@ -36,7 +45,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/section?lawId=${id}`)
+    const response = await axios.get(`/api/v1/lawful/section?LawId=${id}`)
     sections.value = response.data
   } catch (error) {
     console.error('Error fetching sections:', error)
@@ -60,6 +69,15 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
   }
 }
 
+const fetchStoredSections = async () => {
+  try {
+    const response = await axios.get('/api/v1/lawful/store') // Call the endpoint to fetch stored sections
+    storedSections.value = response.data // Assign the response data to storedSections
+  } catch (error) {
+    console.error('Error fetching stored sections:', error)
+  }
+}
+
 watch(selectedLawId, (newId) => {
   if (newId) {
     fetchSections(newId)
@@ -70,34 +88,52 @@ watch(selectedLawId, (newId) => {
 </script>
 
 <template>
-  <header>
-    <v-select
-      v-if="laws.length > 0"
-      v-model="selectedLawId"
-      :items="laws"
-      item-title="Title"
-      item-value="Id"
-      label="Select a law"
-    ></v-select>
-    <p v-else>No laws available</p>
-  </header>
+  <v-container>
+    <v-row>
+      <v-col cols="6">
+        <header>
+          <v-select
+            v-if="laws.length > 0"
+            v-model="selectedLawId"
+            :items="laws"
+            item-title="Title"
+            item-value="Id"
+            label="Select a law"
+          ></v-select>
+          <p v-else>No laws available</p>
+        </header>
 
-  <main>
-    {{ selectedLawId }}
-    <div v-if="sections.length > 0">
-      <h2>Sections:</h2>
-        <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
-          <v-card-title>{{ section.Title }}</v-card-title>
-          <v-card-text>{{ section.Description }}</v-card-text>
-          <v-card-text>{{ section.UserDescription }}</v-card-text>
-          <v-card-actions>
-            <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
-          </v-card-actions>
-        </v-card>
-    </div>
-    <p v-else-if="selectedLawId">Loading sections...</p>
-    <p v-else>Select a law to view its sections</p>
-  </main>
+        <main>
+          {{ selectedLawId }}
+          <div v-if="sections.length > 0">
+            <h2>Sections:</h2>
+              <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
+                <v-card-title>{{ section.Title }}</v-card-title>
+                <v-card-text>{{ section.Description }}</v-card-text>
+                <v-card-text>{{ section.UserDescription }}</v-card-text>
+                <v-card-actions>
+                  <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
+                </v-card-actions>
+              </v-card>
+          </div>
+          <p v-else-if="selectedLawId">Loading sections...</p>
+          <p v-else>Select a law to view its sections</p>
+        </main>
+      </v-col>
+      <v-col cols="6">
+        <h1>Stored Sections</h1>
+        <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn> <!-- Refresh button -->
+        <div v-if="storedSections.length > 0">
+          <v-card v-for="(section, index) in storedSections" :key="section.Id" class="mt-2">
+            <v-card-title>{{ section.Title }}</v-card-title>
+            <v-card-text>{{ section.Description }}</v-card-text>
+            <v-card-text>{{ section.UserDescription }}</v-card-text>
+          </v-card>
+        </div>
+        <p v-else>No stored sections available</p>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style scoped>

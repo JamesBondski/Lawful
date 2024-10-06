@@ -11,28 +11,6 @@ namespace LawfulMod.API
     [Route("api/v1/lawful")]
     public class CivicsController : Controller
     {
-        [HttpPost("store")]
-        [AllowAnonymous]
-        public string StoreSection(int lawId, int sectionIndex)
-        {
-            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
-            if (law != null)
-            {
-                var section = law.Sections[sectionIndex];
-                var json = JsonConvert.SerializeObject(section, Formatting.Indented, new CivicsJsonConverter());
-                var sectionDoc = new BsonDocument();
-                sectionDoc["lawId"] = lawId;
-                sectionDoc["sectionIndex"] = sectionIndex;
-                sectionDoc["json"] = json;
-                var id = LawfulPlugin.Obj.Db?.GetCollection("sections").Insert(sectionDoc);
-                return id.ToString();
-            }
-            else
-            {
-                return "";
-            }
-        }
-
         [HttpGet("json")]
         [AllowAnonymous]
         public string SerializeLaw(int Id)

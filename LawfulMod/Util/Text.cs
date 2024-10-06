@@ -2,7 +2,8 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Eco.Moose.Utils.TextUtils
+// From MooseCore.Util.TextUtils
+namespace LawfulMod.Util
 {
     public static class TextUtils
     {

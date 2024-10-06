@@ -1,6 +1,6 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
-using Eco.Moose.Utils.TextUtils;
+using LawfulMod.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
