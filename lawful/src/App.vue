@@ -22,7 +22,7 @@ interface SectionDto {
 }
 
 interface StoredSectionDto {
-  Id: string;
+  Id: number;
   Title: string;
   Description: string;
   UserDescription: string;
@@ -80,6 +80,28 @@ const fetchStoredSections = async () => {
   }
 }
 
+const importSection = async (sectionId: number) => {
+  if (selectedLawId.value) {
+    try {
+      const response = await axios.post('/api/v1/lawful/import', null, {
+        params: {
+          lawId: selectedLawId.value,
+          sectionId: sectionId
+        }
+      });
+      fetchStoredSections()
+      console.log('Section imported successfully:', response.data);
+      // You can add additional logic here, such as showing a success message to the user
+    } catch (error) {
+      console.error('Error importing section:', error);
+      // You can add error handling logic here, such as showing an error message to the user
+    }
+  } else {
+    console.error('No law selected for import');
+    // Optionally, show a message to the user indicating that no law is selected
+  }
+}
+
 watch(selectedLawId, (newId) => {
   if (newId) {
     fetchSections(newId)
@@ -94,6 +116,7 @@ watch(selectedLawId, (newId) => {
     <v-row>
       <v-col cols="6">
         <header>
+          <h1>Current Laws</h1>
           <v-select
             v-if="laws.length > 0"
             v-model="selectedLawId"
@@ -106,7 +129,6 @@ watch(selectedLawId, (newId) => {
         </header>
 
         <main>
-          <h1>Current Laws</h1>
           <div v-if="sections.length > 0">
             <h2>Sections:</h2>
               <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
@@ -124,12 +146,15 @@ watch(selectedLawId, (newId) => {
       </v-col>
       <v-col cols="6">
         <h1>Stored Sections</h1>
-        <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn> <!-- Refresh button -->
+        <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn>
         <div v-if="storedSections.length > 0">
           <v-card v-for="(section, index) in storedSections" :key="section.Id" class="mt-2">
             <v-card-title>{{ section.Title }}</v-card-title>
             <v-card-text>{{ section.Description }}</v-card-text>
             <v-card-text>{{ section.UserDescription }}</v-card-text>
+            <v-card-actions>
+              <v-btn @click="importSection(section.Id)" color="success">Import</v-btn>
+            </v-card-actions>
           </v-card>
         </div>
         <p v-else>No stored sections available</p>
