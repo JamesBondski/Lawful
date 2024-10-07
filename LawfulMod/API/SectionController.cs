@@ -1,5 +1,7 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
+using Eco.Gameplay.Players;
+using Eco.WebServer.Web.Authentication;
 using LawfulMod.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,7 @@ namespace LawfulMod.API
     [Route("api/v1/lawful/section")]
     public class SectionController : Controller
     {
-        public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription);
+        public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
 
         [HttpGet]
         [AllowAnonymous]
@@ -18,13 +20,14 @@ namespace LawfulMod.API
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                int index = 0;
-                return law.Sections.Select(s => new SectionDto(law.Id, index++, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription)).ToArray();
+                return law.Sections.Select((s, index) => new SectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, AuthorizationHelper.CanStore(ContextUser, lawId, index))).ToArray();
             }
             else
             {
                 return new SectionDto[0];
             }
         }
+
+        private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
     }
 }

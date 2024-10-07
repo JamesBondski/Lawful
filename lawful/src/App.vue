@@ -19,6 +19,7 @@ interface SectionDto {
   Title: string;
   Description: string;
   UserDescription: string;
+  CanStore: boolean; // Added CanStore field
 }
 
 interface StoredSectionDto {
@@ -127,7 +128,7 @@ watch(selectedLawId, (newId) => {
             <v-card-text>{{ section.Description }}</v-card-text>
             <v-card-text>{{ section.UserDescription }}</v-card-text>
             <v-card-actions>
-              <v-btn @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
+              <v-btn v-if="section.CanStore" @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
             </v-card-actions>
           </v-card>
         </div>
