@@ -18,7 +18,6 @@ namespace LawfulMod.API
         private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
 
         [HttpPost]
-        [AllowAnonymous]
         public IActionResult StoreSection(int lawId, int sectionIndex)
         {
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
