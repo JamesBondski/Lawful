@@ -54,6 +54,9 @@
 		<Reference Include="Eco.Shared">
 			<HintPath>..\eco-dlls\Eco.WebServer.dll</HintPath>
 		</Reference>
+		<Reference Include="Eco.Shared">
+			<HintPath>..\eco-dlls\Eco.Mods.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

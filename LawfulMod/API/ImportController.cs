@@ -17,6 +17,7 @@ namespace LawfulMod.API
             var section = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindById(sectionId);
             var bundle = CivicBundle.LoadFromText(section.JSON);
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
+            
             var sectionObj = new ImportContext().DeserialiseGenericObject(bundle.Civics.First().Data, typeof(LawSection));
             law.Sections.Add((LawSection)sectionObj);
             return "";

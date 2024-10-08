@@ -3,7 +3,6 @@ using Eco.Gameplay.Civics.Laws;
 using Eco.Gameplay.Players;
 using Eco.WebServer.Web.Authentication;
 using LawfulMod.Util;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LawfulMod.API
@@ -14,7 +13,6 @@ namespace LawfulMod.API
         public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
 
         [HttpGet]
-        [AllowAnonymous]
         public SectionDto[] GetSection(int lawId)
         {
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);

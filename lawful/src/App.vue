@@ -34,9 +34,17 @@ const selectedLawId = ref<number | null>(null)
 const sections = ref<SectionDto[]>([])
 const storedSections = ref<StoredSectionDto[]>([]) // New reactive variable for stored sections
 
+const getHeadersFromStorage = () => {
+    const worldTicket = localStorage.getItem("worldTicket");
+    if (!worldTicket) return {};
+    return {
+        'X-Auth-Token': worldTicket,
+    }
+}
+
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/v1/lawful/law')
+    const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() }) // Added headers
     laws.value = response.data
     await fetchStoredSections(); // Fetch stored sections on mount
   } catch (error) {
@@ -46,7 +54,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/section?LawId=${id}`)
+    const response = await axios.get(`/api/v1/lawful/section?LawId=${id}`, { headers: getHeadersFromStorage() }) // Added headers
     sections.value = response.data
   } catch (error) {
     console.error('Error fetching sections:', error)
@@ -60,7 +68,8 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
       params: {
         lawId,
         sectionIndex
-      }
+      },
+      headers: getHeadersFromStorage() // Added headers
     })
     console.log('Section stored successfully:', response.data)
     // You can add additional logic here, such as showing a success message to the user
@@ -74,7 +83,7 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
 
 const fetchStoredSections = async () => {
   try {
-    const response = await axios.get('/api/v1/lawful/store') // Call the endpoint to fetch stored sections
+    const response = await axios.get('/api/v1/lawful/store', { headers: getHeadersFromStorage() }) // Added headers
     storedSections.value = response.data // Assign the response data to storedSections
   } catch (error) {
     console.error('Error fetching stored sections:', error)
@@ -88,7 +97,8 @@ const importSection = async (sectionId: number) => {
         params: {
           lawId: selectedLawId.value,
           sectionId: sectionId
-        }
+        },
+        headers: getHeadersFromStorage() // Added headers
       });
       fetchStoredSections()
       console.log('Section imported successfully:', response.data);
