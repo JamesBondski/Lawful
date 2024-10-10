@@ -20,16 +20,16 @@ namespace LawfulMod.API
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public LawDto GetLaw(int id)
+        public IActionResult GetLaw(int id)
         {
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == id);
             if (law != null)
             {
-                return GetDto(law);
+                return Ok(GetDto(law));
             }
             else
             {
-                return null;
+                return NotFound();
             }
         }
 
