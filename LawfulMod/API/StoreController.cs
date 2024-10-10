@@ -19,7 +19,7 @@ namespace LawfulMod.API
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                if (!AuthorizationHelper.CanStore(ContextUser, lawId, sectionIndex)) // Check if user is authorized to store
+                if (!this.CanStore(lawId, sectionIndex)) // Check if user is authorized to store
                 {
                     return StatusCode(403); // Return 403 Forbidden if not authorized
                 }
@@ -61,7 +61,7 @@ namespace LawfulMod.API
             }
 
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == selectedLawId);
-            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, AuthorizationHelper.CanImport(ContextUser, law, s))).ToArray();
+            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s))).ToArray();
         }
     }
 }

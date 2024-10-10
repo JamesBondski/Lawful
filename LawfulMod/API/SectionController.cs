@@ -16,7 +16,7 @@ namespace LawfulMod.API
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                return law.Sections.Select((s, index) => new SectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, AuthorizationHelper.CanStore(ContextUser, lawId, index))).ToArray();
+                return law.Sections.Select((s, index) => new SectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, this.CanStore(lawId, index))).ToArray();
             }
             else
             {

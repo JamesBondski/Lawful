@@ -24,7 +24,7 @@ namespace LawfulMod.API
                 return NotFound();
             }
 
-            if (!AuthorizationHelper.CanImport(ContextUser, law, section))
+            if (!this.CanImport(law, section))
             {
                 return StatusCode(403);
             }
