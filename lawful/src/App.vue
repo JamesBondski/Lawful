@@ -27,6 +27,7 @@ interface StoredSectionDto {
   Title: string;
   Description: string;
   UserDescription: string;
+  CanImport: boolean; // Added CanImport field
 }
 
 const laws = ref<LawDto[]>([])
@@ -46,7 +47,7 @@ onMounted(async () => {
   try {
     const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() }) // Added headers
     laws.value = response.data
-    await fetchStoredSections(); // Fetch stored sections on mount
+    await fetchStoredSections(0); // Fetch stored sections on mount
   } catch (error) {
     console.error('Error fetching laws:', error)
   }
@@ -74,16 +75,19 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
     console.log('Section stored successfully:', response.data)
     // You can add additional logic here, such as showing a success message to the user
 
-    fetchStoredSections();
+    fetchStoredSections(lawId);
   } catch (error) {
     console.error('Error storing section:', error)
     // You can add error handling logic here, such as showing an error message to the user
   }
 }
 
-const fetchStoredSections = async () => {
+const fetchStoredSections = async (lawId: number) => {
   try {
-    const response = await axios.get('/api/v1/lawful/store', { headers: getHeadersFromStorage() }) // Added headers
+    const response = await axios.get('/api/v1/lawful/store', { 
+      params: { selectedLawId: selectedLawId.value || 0 }, // Pass selectedLawId as a parameter
+      headers: getHeadersFromStorage() 
+    }) // Added headers
     storedSections.value = response.data // Assign the response data to storedSections
   } catch (error) {
     console.error('Error fetching stored sections:', error)
@@ -100,7 +104,7 @@ const importSection = async (sectionId: number) => {
         },
         headers: getHeadersFromStorage() // Added headers
       });
-      fetchStoredSections()
+      fetchStoredSections(selectedLawId.value)
       console.log('Section imported successfully:', response.data);
       // You can add additional logic here, such as showing a success message to the user
     } catch (error) {
@@ -116,6 +120,7 @@ const importSection = async (sectionId: number) => {
 watch(selectedLawId, (newId) => {
   if (newId) {
     fetchSections(newId)
+    fetchStoredSections(newId)
   } else {
     sections.value = []
   }
@@ -154,7 +159,7 @@ watch(selectedLawId, (newId) => {
             <v-card-text>{{ section.Description }}</v-card-text>
             <v-card-text>{{ section.UserDescription }}</v-card-text>
             <v-card-actions>
-              <v-btn @click="importSection(section.Id)" color="success">Import</v-btn>
+              <v-btn v-if="section.CanImport" @click="importSection(section.Id)" color="success">Import</v-btn>
             </v-card-actions>
           </v-card>
         </div>

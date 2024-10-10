@@ -10,6 +10,8 @@ namespace LawfulMod.API
     [Route("api/v1/lawful/section")]
     public class SectionController : Controller
     {
+        private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
+
         public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
 
         [HttpGet]
@@ -25,7 +27,5 @@ namespace LawfulMod.API
                 return new SectionDto[0];
             }
         }
-
-        private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
     }
 }

@@ -52,14 +52,20 @@ namespace LawfulMod.API
             }
         }
 
-        public record StoredSectionDto(int Id, string Title, string Description, string UserDescription);
+        public record StoredSectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport);
 
         [HttpGet]
         [AllowAnonymous]
-        public StoredSectionDto[] GetStoredSections()
+        public StoredSectionDto[] GetStoredSections(int selectedLawId = 0)
         {
-            var sections = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindAll(); // Update to use the POCO class
-            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription)).ToArray();
+            var sections = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindAll();
+            if(sections == null)
+            {
+                return new StoredSectionDto[0];
+            }
+
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == selectedLawId);
+            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, AuthorizationHelper.CanImport(ContextUser, law, s))).ToArray();
         }
     }
 }
