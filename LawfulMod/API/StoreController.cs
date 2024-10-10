@@ -1,8 +1,6 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
-using Eco.Gameplay.Players;
 using Eco.Mods.LawfulMod.CivicsImpExp;
-using Eco.WebServer.Web.Authentication;
 using LawfulMod.Data;
 using LawfulMod.Util;
 using LiteDB;
@@ -13,10 +11,8 @@ using Newtonsoft.Json;
 namespace LawfulMod.API
 {
     [Route("api/v1/lawful/store")]
-    public class StoreController : Controller
+    public class StoreController : BaseController
     {
-        private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
-
         [HttpPost]
         public IActionResult StoreSection(int lawId, int sectionIndex)
         {

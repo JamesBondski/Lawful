@@ -1,17 +1,13 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
-using Eco.Gameplay.Players;
-using Eco.WebServer.Web.Authentication;
 using LawfulMod.Util;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LawfulMod.API
 {
     [Route("api/v1/lawful/section")]
-    public class SectionController : Controller
+    public class SectionController : BaseController
     {
-        private User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
-
         public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
 
         [HttpGet]

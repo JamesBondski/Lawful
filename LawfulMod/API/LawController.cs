@@ -2,16 +2,11 @@
 using Eco.Gameplay.Civics.Laws;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LawfulMod.API
 {
     [Route("api/v1/lawful/law")]
-    public class LawController
+    public class LawController : BaseController
     {
         public record LawDto(int Id, string Title, string Description, string Creator, String State, string Settlement, string HostObject);
 
