@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
-import { VBtn, VCard, VCardItem, VCardTitle, VCardActions } from 'vuetify/components'
+import { VBtn, VCard, VCardItem, VCardTitle, VCardActions, VAlert } from 'vuetify/components'
+import SectionCard from './components/SectionCard.vue'; // Import the new component
 
 interface LawDto {
   Id: number;
@@ -43,13 +44,24 @@ const getHeadersFromStorage = () => {
     }
 }
 
+const alertMessage = ref<string | null>(null) // New reactive variable for alert message
+const alertType = ref<'success' | 'error' | null>(null) // New reactive variable for alert type
+
+const showAlert = (message: string, type: 'success' | 'error') => {
+    alertMessage.value = message;
+    alertType.value = type;
+    setTimeout(() => {
+        alertMessage.value = null; // Clear alert after a timeout
+    }, 3000); // Adjust timeout duration as needed
+}
+
 onMounted(async () => {
   try {
     const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() }) // Added headers
     laws.value = response.data
     await fetchStoredSections(0); // Fetch stored sections on mount
-  } catch (error) {
-    console.error('Error fetching laws:', error)
+  } catch {
+    showAlert('Error fetching laws', 'error'); // Show error alert
   }
 })
 
@@ -58,7 +70,7 @@ const fetchSections = async (id: string | number) => {
     const response = await axios.get(`/api/v1/lawful/section?LawId=${id}`, { headers: getHeadersFromStorage() }) // Added headers
     sections.value = response.data
   } catch (error) {
-    console.error('Error fetching sections:', error)
+    showAlert('Error fetching sections:', 'error');
     sections.value = []
   }
 }
@@ -72,12 +84,12 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
       },
       headers: getHeadersFromStorage() // Added headers
     })
-    console.log('Section stored successfully:', response.data)
+    showAlert('Section stored successfully', 'success'); // Show success alert
     // You can add additional logic here, such as showing a success message to the user
 
     fetchStoredSections(lawId);
-  } catch (error) {
-    console.error('Error storing section:', error)
+  } catch {
+    showAlert('Error storing section', 'error'); // Show error alert
     // You can add error handling logic here, such as showing an error message to the user
   }
 }
@@ -105,14 +117,14 @@ const importSection = async (sectionId: number) => {
         headers: getHeadersFromStorage() // Added headers
       });
       fetchStoredSections(selectedLawId.value)
-      console.log('Section imported successfully:', response.data);
+      showAlert('Section imported successfully', 'success'); // Show success alert
       // You can add additional logic here, such as showing a success message to the user
-    } catch (error) {
-      console.error('Error importing section:', error);
+    } catch {
+      showAlert('Error importing section', 'error'); // Show error alert
       // You can add error handling logic here, such as showing an error message to the user
     }
   } else {
-    console.error('No law selected for import');
+    showAlert('No law selected for import', 'error'); // Show error alert
     // Optionally, show a message to the user indicating that no law is selected
   }
 }
@@ -129,6 +141,7 @@ watch(selectedLawId, (newId) => {
 
 <template>
   <v-container>
+    <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert> <!-- Add alert component -->
     <v-row>
       <v-col cols="6">
         <h1>Current Laws</h1>
@@ -138,14 +151,12 @@ watch(selectedLawId, (newId) => {
 
         <div v-if="sections.length > 0">
           <h2>Sections:</h2>
-          <v-card v-for="(section, index) in sections" :key="index" class="mt-2">
-            <v-card-title>{{ section.Title }}</v-card-title>
-            <v-card-text>{{ section.Description }}</v-card-text>
-            <v-card-text>{{ section.UserDescription }}</v-card-text>
-            <v-card-actions>
-              <v-btn v-if="section.CanStore" @click="storeSection(Number(selectedLawId), section.Index)" color="primary">Store</v-btn>
-            </v-card-actions>
-          </v-card>
+          <SectionCard 
+            v-for="(section, index) in sections" 
+            :key="index" 
+            :section="section" 
+            :storeSection="() => storeSection(Number(selectedLawId), section.Index)" 
+          /> <!-- Use the new SectionCard component -->
         </div>
         <p v-else-if="selectedLawId">Loading sections...</p>
         <p v-else>Select a law to view its sections</p>
