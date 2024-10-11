@@ -48,7 +48,7 @@ namespace LawfulMod.API
             }
         }
 
-        public record StoredSectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport);
+        public record StoredSectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport, bool CanDelete);
 
         [HttpGet]
         [AllowAnonymous]
@@ -60,8 +60,30 @@ namespace LawfulMod.API
                 return new StoredSectionDto[0];
             }
 
+            // We need the law to check if the user can import the section. If it is not a draft, it can not be imported to.
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == selectedLawId);
-            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s))).ToArray();
+            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s), this.CanDelete(s))).ToArray();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStoredSection(int id)
+        {
+            var sectionCollection = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections");
+            var section = sectionCollection?.FindById(id);
+            
+            //Check for sectionCollection is not necessary here
+            if (section == null || sectionCollection == null)
+            {
+                return NotFound(); // Return 404 Not Found if the section is not found
+            }
+
+            if (!this.CanDelete(section))
+            {
+                return StatusCode(403); // Return 403 Forbidden if not authorized
+            }
+
+            sectionCollection.Delete(id); // Delete the section by id
+            return NoContent(); // Return 204 No Content on successful deletion
         }
     }
 }

@@ -31,4 +31,13 @@ public class BaseController : Controller
 
         return false;
     }
+
+    protected bool CanDelete(SectionDocument? storedSection)
+    {
+        if(this.ContextUser != null && storedSection != null)
+        {
+            return this.ContextUser.IsAdmin;
+        }
+        return false;
+    }
 }
