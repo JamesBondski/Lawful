@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { VBtn, VCard, VCardItem, VCardTitle, VCardActions, VAlert } from 'vuetify/components'
 import SectionCard from './components/SectionCard.vue'; // Import the new component
+import StoredSectionCard from './components/StoredSectionCard.vue'; // Import the new component
 
 interface LawDto {
   Id: number;
@@ -29,6 +30,7 @@ interface StoredSectionDto {
   Description: string;
   UserDescription: string;
   CanImport: boolean; // Added CanImport field
+  CanDelete: boolean; // Added CanDelete field
 }
 
 const laws = ref<LawDto[]>([])
@@ -129,6 +131,18 @@ const importSection = async (sectionId: number) => {
   }
 }
 
+const deleteStoredSection = async (sectionId: number) => {
+  try {
+    await axios.delete(`/api/v1/law/store/${sectionId}`, { // Updated endpoint to include sectionId
+      headers: getHeadersFromStorage() // Added headers
+    });
+    showAlert('Section deleted successfully', 'success'); // Show success alert
+    fetchStoredSections(selectedLawId.value || 0); // Refresh stored sections
+  } catch {
+    showAlert('Error deleting section', 'error'); // Show error alert
+  }
+}
+
 watch(selectedLawId, (newId) => {
   if (newId) {
     fetchSections(newId)
@@ -141,7 +155,7 @@ watch(selectedLawId, (newId) => {
 
 <template>
   <v-container>
-    <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert> <!-- Add alert component -->
+    <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert>
     <v-row>
       <v-col cols="6">
         <h1>Current Laws</h1>
@@ -156,7 +170,7 @@ watch(selectedLawId, (newId) => {
             :key="index" 
             :section="section" 
             :storeSection="() => storeSection(Number(selectedLawId), section.Index)" 
-          /> <!-- Use the new SectionCard component -->
+          />
         </div>
         <p v-else-if="selectedLawId">Loading sections...</p>
         <p v-else>Select a law to view its sections</p>
@@ -165,14 +179,13 @@ watch(selectedLawId, (newId) => {
         <h1>Stored Sections</h1>
         <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn>
         <div v-if="storedSections.length > 0">
-          <v-card v-for="(section, index) in storedSections" :key="section.Id" class="mt-2">
-            <v-card-title>{{ section.Title }}</v-card-title>
-            <v-card-text>{{ section.Description }}</v-card-text>
-            <v-card-text>{{ section.UserDescription }}</v-card-text>
-            <v-card-actions>
-              <v-btn v-if="section.CanImport" @click="importSection(section.Id)" color="success">Import</v-btn>
-            </v-card-actions>
-          </v-card>
+          <StoredSectionCard 
+            v-for="(section, index) in storedSections" 
+            :key="section.Id" 
+            :section="section" 
+            :importSection="importSection" 
+            :deleteSection="() => deleteStoredSection(section.Id)"
+          />
         </div>
         <p v-else>No stored sections available</p>
       </v-col>

@@ -5,6 +5,7 @@
       <v-card-text>{{ section.UserDescription }}</v-card-text>
       <v-card-actions>
         <v-btn v-if="section.CanImport" @click="importSection(section.Id)" color="success">Import</v-btn>
+        <v-btn v-if="section.CanDelete" @click="deleteSection(section.Id)" color="error">Delete</v-btn>
       </v-card-actions>
     </v-card>
   </template>
@@ -17,8 +18,10 @@
       Description: string;
       UserDescription: string;
       CanImport: boolean;
+      CanDelete: boolean;
     };
     importSection: (sectionId: number) => void;
+    deleteSection: (sectionId: number) => void;
   }>();
   </script>
   
