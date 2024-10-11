@@ -133,7 +133,7 @@ const importSection = async (sectionId: number) => {
 
 const deleteStoredSection = async (sectionId: number) => {
   try {
-    await axios.delete(`/api/v1/law/store/${sectionId}`, { // Updated endpoint to include sectionId
+    await axios.delete(`/api/v1/lawful/store/${sectionId}`, { // Updated endpoint to include sectionId
       headers: getHeadersFromStorage() // Added headers
     });
     showAlert('Section deleted successfully', 'success'); // Show success alert
