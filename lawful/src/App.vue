@@ -4,6 +4,7 @@ import axios from 'axios'
 import { VBtn, VCard, VCardItem, VCardTitle, VCardActions, VAlert } from 'vuetify/components'
 import SectionCard from './components/SectionCard.vue'; // Import the new component
 import StoredSectionCard from './components/StoredSectionCard.vue'; // Import the new component
+import useClipboard from 'vue-clipboard3'
 
 interface LawDto {
   Id: number;
@@ -37,6 +38,7 @@ const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
 const sections = ref<SectionDto[]>([])
 const storedSections = ref<StoredSectionDto[]>([]) // New reactive variable for stored sections
+const clipboard = useClipboard();
 
 const getHeadersFromStorage = () => {
     const worldTicket = localStorage.getItem("worldTicket");
@@ -143,6 +145,19 @@ const deleteStoredSection = async (sectionId: number) => {
   }
 }
 
+const sectionJson = async (sectionId: number) => {
+  try {
+    const response = await axios.get(`/api/v1/lawful/store/${sectionId}/json`, { 
+      headers: getHeadersFromStorage() 
+    });
+    await clipboard.toClipboard(JSON.stringify(response.data));
+    
+    showAlert('JSON has been copied to clipboard', 'success'); // Show success alert
+  } catch {
+    showAlert('Error fetching JSON', 'error'); // Show error alert
+  }
+}
+
 watch(selectedLawId, (newId) => {
   if (newId) {
     fetchSections(newId)
@@ -185,6 +200,7 @@ watch(selectedLawId, (newId) => {
             :section="section" 
             :importSection="importSection" 
             :deleteSection="() => deleteStoredSection(section.Id)"
+            :sectionJson="sectionJson"
           />
         </div>
         <p v-else>No stored sections available</p>

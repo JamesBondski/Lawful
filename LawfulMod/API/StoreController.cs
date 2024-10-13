@@ -85,5 +85,17 @@ namespace LawfulMod.API
             sectionCollection.Delete(id); // Delete the section by id
             return NoContent(); // Return 204 No Content on successful deletion
         }
+
+        [HttpGet("{id}/json")]
+        public IActionResult GetJson(int id, string filename)
+        {
+            var section = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindById(id);
+            if (section == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(section.JSON);
+        }
     }
 }

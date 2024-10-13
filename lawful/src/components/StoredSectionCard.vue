@@ -6,6 +6,7 @@
       <v-card-actions>
         <v-btn v-if="section.CanImport" @click="importSection(section.Id)" color="success">Import</v-btn>
         <v-btn v-if="section.CanDelete" @click="deleteSection(section.Id)" color="error">Delete</v-btn>
+        <v-btn @click="sectionJson(section.Id)" color="primary">JSON</v-btn>
       </v-card-actions>
     </v-card>
   </template>
@@ -22,6 +23,7 @@
     };
     importSection: (sectionId: number) => void;
     deleteSection: (sectionId: number) => void;
+    sectionJson: (sectionId: number) => void;
   }>();
   </script>
   
