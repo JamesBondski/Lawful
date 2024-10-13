@@ -7,6 +7,7 @@ using LiteDB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LawfulMod.API
 {
@@ -55,7 +56,7 @@ namespace LawfulMod.API
         public StoredSectionDto[] GetStoredSections(int selectedLawId = 0)
         {
             var sections = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindAll();
-            if(sections == null)
+            if (sections == null)
             {
                 return new StoredSectionDto[0];
             }
@@ -70,7 +71,7 @@ namespace LawfulMod.API
         {
             var sectionCollection = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections");
             var section = sectionCollection?.FindById(id);
-            
+
             //Check for sectionCollection is not necessary here
             if (section == null || sectionCollection == null)
             {
@@ -97,5 +98,21 @@ namespace LawfulMod.API
 
             return Ok(section.JSON);
         }
+
+        [HttpGet("{id}/references")]
+        public IActionResult GetReferences(int id)
+        {
+            var section = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindById(id);
+            if (section == null)
+            {
+                return NotFound();
+            }
+            var references = FindReferences(JObject.Parse(section.JSON));
+            return Ok(references.Select(r => r["type"]?.ToString() + ":" + r["name"]?.ToString()));
+        }
+
+        private IEnumerable<JObject> FindReferences(JObject data) => data.DescendantsAndSelf()
+            .OfType<JObject>()
+            .Where(item => item["reference"]?.Value<bool>() == true);
     }
 }

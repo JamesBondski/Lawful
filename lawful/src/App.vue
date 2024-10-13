@@ -151,8 +151,13 @@ const sectionJson = async (sectionId: number) => {
       headers: getHeadersFromStorage() 
     });
     await clipboard.toClipboard(JSON.stringify(response.data));
+
+    const references = await axios.get(`/api/v1/lawful/store/${sectionId}/references`, { 
+      headers: getHeadersFromStorage() 
+    });
+    showAlert(references.data.join(', '), 'success');
     
-    showAlert('JSON has been copied to clipboard', 'success'); // Show success alert
+    //showAlert('JSON has been copied to clipboard', 'success'); // Show success alert
   } catch {
     showAlert('Error fetching JSON', 'error'); // Show error alert
   }
