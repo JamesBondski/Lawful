@@ -2,8 +2,9 @@
 import { ref, onMounted, watch } from 'vue'
 import * as lawful from '@/services/lawful';
 import { VBtn, VCard, VCardItem, VCardTitle, VCardActions, VAlert } from 'vuetify/components'
-import SectionCard from './components/SectionCard.vue'; // Import the new component
-import StoredSectionCard from './components/StoredSectionCard.vue'; // Import the new component
+import SectionCard from './components/SectionCard.vue';
+import StoredSectionCard from './components/StoredSectionCard.vue';
+import ImportSectionDialog from './components/ImportSectionDialog.vue'; // Import the new dialog component
 import useClipboard from 'vue-clipboard3'
 
 interface LawDto {
@@ -51,6 +52,14 @@ const showAlert = (message: string, type: 'success' | 'error') => {
     }, 3000); // Adjust timeout duration as needed
 }
 
+const dialogVisible = ref(false); // New reactive variable for dialog visibility
+const selectedSectionId = ref<number | null>(null); // New reactive variable for selected section ID
+
+const openImportDialog = (sectionId: number) => {
+    selectedSectionId.value = sectionId; // Set the selected section ID
+    dialogVisible.value = true; // Open the dialog
+}
+
 onMounted(async () => {
   try {
     laws.value = await lawful.fetchLaws(); // Use the new API method
@@ -89,13 +98,7 @@ const fetchStoredSections = async (lawId: number) => {
 
 const importSection = async (sectionId: number) => {
   if (selectedLawId.value) {
-    try {
-      await lawful.importSection(selectedLawId.value, sectionId); // Use the new API method
-      fetchStoredSections(selectedLawId.value)
-      showAlert('Section imported successfully', 'success'); // Show success alert
-    } catch {
-      showAlert('Error importing section', 'error'); // Show error alert
-    }
+    openImportDialog(sectionId); // Open the dialog instead of directly importing
   } else {
     showAlert('No law selected for import', 'error'); // Show error alert
   }
@@ -155,6 +158,7 @@ watch(selectedLawId, (newId) => {
       <v-col cols="6">
         <h1>Stored Sections</h1>
         <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn>
+        
         <div v-if="storedSections.length > 0">
           <StoredSectionCard 
             v-for="(section, index) in storedSections" 
@@ -168,6 +172,14 @@ watch(selectedLawId, (newId) => {
         <p v-else>No stored sections available</p>
       </v-col>
     </v-row>
+
+    <ImportSectionDialog 
+      :isVisible="dialogVisible" 
+      :lawId="selectedLawId ?? 0" 
+      :sectionId="selectedSectionId ?? 0" 
+      @close="dialogVisible = false" 
+      @import="importSection" 
+    /> <!-- New dialog component usage -->
   </v-container>
 </template>
 
