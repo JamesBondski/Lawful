@@ -1,6 +1,7 @@
 ﻿using Eco.Core.Systems;
 using Eco.Gameplay.Civics.Laws;
 using Eco.Gameplay.Civics.Misc;
+using LawfulMod.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,22 @@ namespace LawfulMod.API
         private LawDto GetDto(Law law)
         {
             return new LawDto(law.Id, law.Name, law.UserDescription, law.Creator.Name, law.State.ToString(), law.Settlement.Name, law.HostObject.Object?.Name);
+        }
+
+        public record SectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
+
+        [HttpGet("{lawId}/sections")]
+        public SectionDto[] GetSection(int lawId)
+        {
+            var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
+            if (law != null)
+            {
+                return law.Sections.Select((s, index) => new SectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, this.CanStore(lawId, index))).ToArray();
+            }
+            else
+            {
+                return new SectionDto[0];
+            }
         }
     }
 }

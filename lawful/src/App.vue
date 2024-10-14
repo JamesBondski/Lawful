@@ -71,7 +71,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/section?LawId=${id}`, { headers: getHeadersFromStorage() }) // Added headers
+    const response = await axios.get(`/api/v1/lawful/law/{id}/sections`, { headers: getHeadersFromStorage() }) // Added headers
     sections.value = response.data
   } catch (error) {
     showAlert('Error fetching sections:', 'error');
