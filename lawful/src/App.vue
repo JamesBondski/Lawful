@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import axios from 'axios'
+import * as lawful from '@/services/lawful';
 import { VBtn, VCard, VCardItem, VCardTitle, VCardActions, VAlert } from 'vuetify/components'
 import SectionCard from './components/SectionCard.vue'; // Import the new component
 import StoredSectionCard from './components/StoredSectionCard.vue'; // Import the new component
@@ -40,14 +40,6 @@ const sections = ref<SectionDto[]>([])
 const storedSections = ref<StoredSectionDto[]>([]) // New reactive variable for stored sections
 const clipboard = useClipboard();
 
-const getHeadersFromStorage = () => {
-    const worldTicket = localStorage.getItem("worldTicket");
-    if (!worldTicket) return {};
-    return {
-        'X-Auth-Token': worldTicket,
-    }
-}
-
 const alertMessage = ref<string | null>(null) // New reactive variable for alert message
 const alertType = ref<'success' | 'error' | null>(null) // New reactive variable for alert type
 
@@ -61,9 +53,8 @@ const showAlert = (message: string, type: 'success' | 'error') => {
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() }) // Added headers
-    laws.value = response.data
-    await fetchStoredSections(0); // Fetch stored sections on mount
+    laws.value = await lawful.fetchLaws(); // Use the new API method
+    await lawful.fetchStoredSections(0); // Fetch stored sections on mount
   } catch {
     showAlert('Error fetching laws', 'error'); // Show error alert
   }
@@ -71,8 +62,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/law/{id}/sections`, { headers: getHeadersFromStorage() }) // Added headers
-    sections.value = response.data
+    sections.value = await lawful.fetchSections(id); // Use the new API method
   } catch (error) {
     showAlert('Error fetching sections:', 'error');
     sections.value = []
@@ -81,30 +71,17 @@ const fetchSections = async (id: string | number) => {
 
 const storeSection = async (lawId: number, sectionIndex: number) => {
   try {
-    const response = await axios.post('/api/v1/lawful/store', null, {
-      params: {
-        lawId,
-        sectionIndex
-      },
-      headers: getHeadersFromStorage() // Added headers
-    })
+    await lawful.storeSection(lawId, sectionIndex); // Use the new API method
     showAlert('Section stored successfully', 'success'); // Show success alert
-    // You can add additional logic here, such as showing a success message to the user
-
     fetchStoredSections(lawId);
   } catch {
     showAlert('Error storing section', 'error'); // Show error alert
-    // You can add error handling logic here, such as showing an error message to the user
   }
 }
 
 const fetchStoredSections = async (lawId: number) => {
   try {
-    const response = await axios.get('/api/v1/lawful/store', { 
-      params: { selectedLawId: selectedLawId.value || 0 }, // Pass selectedLawId as a parameter
-      headers: getHeadersFromStorage() 
-    }) // Added headers
-    storedSections.value = response.data // Assign the response data to storedSections
+    storedSections.value = await lawful.fetchStoredSections(lawId); // Use the new API method
   } catch (error) {
     console.error('Error fetching stored sections:', error)
   }
@@ -113,9 +90,7 @@ const fetchStoredSections = async (lawId: number) => {
 const importSection = async (sectionId: number) => {
   if (selectedLawId.value) {
     try {
-      const response = await axios.post(`/api/v1/lawful/law/${selectedLawId.value}/sections/import/${sectionId}`, null, {
-        headers: getHeadersFromStorage() // Added headers
-      });
+      await lawful.importSection(selectedLawId.value, sectionId); // Use the new API method
       fetchStoredSections(selectedLawId.value)
       showAlert('Section imported successfully', 'success'); // Show success alert
     } catch {
@@ -128,9 +103,7 @@ const importSection = async (sectionId: number) => {
 
 const deleteStoredSection = async (sectionId: number) => {
   try {
-    await axios.delete(`/api/v1/lawful/store/${sectionId}`, { // Updated endpoint to include sectionId
-      headers: getHeadersFromStorage() // Added headers
-    });
+    await deleteStoredSection(sectionId); // Use the new API method
     showAlert('Section deleted successfully', 'success'); // Show success alert
     fetchStoredSections(selectedLawId.value || 0); // Refresh stored sections
   } catch {
@@ -140,12 +113,8 @@ const deleteStoredSection = async (sectionId: number) => {
 
 const sectionJson = async (sectionId: number) => {
   try {
-    const response = await axios.get(`/api/v1/lawful/store/${sectionId}/json`, { 
-      headers: getHeadersFromStorage() 
-    });
-    await clipboard.toClipboard(JSON.stringify(response.data));
-    
-    //showAlert('JSON has been copied to clipboard', 'success'); // Show success alert
+    const data = await sectionJson(sectionId); // Use the new API method
+    await clipboard.toClipboard(JSON.stringify(data));
   } catch {
     showAlert('Error fetching JSON', 'error'); // Show error alert
   }
