@@ -11,8 +11,8 @@ using Newtonsoft.Json.Linq;
 
 namespace LawfulMod.API
 {
-    [Route("api/v1/lawful/store")]
-    public class StoreController : BaseController
+    [Route("api/v1/lawful/section")]
+    public class SectionController : BaseController
     {
         [HttpPost]
         public IActionResult StoreSection(int lawId, int sectionIndex)
@@ -49,21 +49,21 @@ namespace LawfulMod.API
             }
         }
 
-        public record StoredSectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport, bool CanDelete);
+        public record SectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport, bool CanDelete);
 
         [HttpGet]
         [AllowAnonymous]
-        public StoredSectionDto[] GetStoredSections(int selectedLawId = 0)
+        public SectionDto[] GetSections(int selectedLawId = 0)
         {
             var sections = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindAll();
             if (sections == null)
             {
-                return new StoredSectionDto[0];
+                return new SectionDto[0];
             }
 
             // We need the law to check if the user can import the section. If it is not a draft, it can not be imported to.
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == selectedLawId);
-            return sections.Select(s => new StoredSectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s), this.CanDelete(s))).ToArray();
+            return sections.Select(s => new SectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s), this.CanDelete(s))).ToArray();
         }
 
         [HttpDelete("{id}")]
@@ -99,6 +99,8 @@ namespace LawfulMod.API
             return Ok(section.JSON);
         }
 
+        public record ReferenceDto(string Type, string Name, string[] possibleValues);
+
         [HttpGet("{id}/references")]
         public IActionResult GetReferences(int id)
         {
@@ -107,8 +109,20 @@ namespace LawfulMod.API
             {
                 return NotFound();
             }
-            var references = FindReferences(JObject.Parse(section.JSON));
-            return Ok(references.Select(r => r["type"]?.ToString() + ":" + r["name"]?.ToString()));
+
+            var references = FindReferences(JObject.Parse(section.JSON))
+                // This Where statement should not be necessary but better safe than sorry.
+                .Where(r => r.ContainsKey("type") && r.ContainsKey("name"))
+                .Select(r => GetReference(r));
+            return Ok(references.ToArray());
+        }
+
+        private ReferenceDto GetReference(JObject data)
+        {
+            var type = data["type"]?.ToString() ?? "No Type";
+            var name = data["name"]?.ToString() ?? "No Name";
+            var possibleValues = Registrars.GetByDerivedTypeOrDefault(type)?.All().Select(o => o.Name).ToArray() ?? new string[0];
+            return new ReferenceDto(type, name, possibleValues);
         }
 
         private IEnumerable<JObject> FindReferences(JObject data) => data.DescendantsAndSelf()
