@@ -113,23 +113,16 @@ const fetchStoredSections = async (lawId: number) => {
 const importSection = async (sectionId: number) => {
   if (selectedLawId.value) {
     try {
-      const response = await axios.post('/api/v1/lawful/import', null, {
-        params: {
-          lawId: selectedLawId.value,
-          sectionId: sectionId
-        },
+      const response = await axios.post(`/api/v1/lawful/law/${selectedLawId.value}/sections/import/${sectionId}`, null, {
         headers: getHeadersFromStorage() // Added headers
       });
       fetchStoredSections(selectedLawId.value)
       showAlert('Section imported successfully', 'success'); // Show success alert
-      // You can add additional logic here, such as showing a success message to the user
     } catch {
       showAlert('Error importing section', 'error'); // Show error alert
-      // You can add error handling logic here, such as showing an error message to the user
     }
   } else {
     showAlert('No law selected for import', 'error'); // Show error alert
-    // Optionally, show a message to the user indicating that no law is selected
   }
 }
 
