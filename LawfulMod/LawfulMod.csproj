@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -60,7 +60,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="copy bin\$(Configuration)\net7.0\$(MSBuildProjectName).dll $(ECO_SERVER_PATH)\Mods&#xD;&#xA;copy bin\$(Configuration)\net7.0\$(MSBuildProjectName).pdb $(ECO_SERVER_PATH)\Mods" />
+	  <Exec Command="copy bin\$(Configuration)\net8.0\$(MSBuildProjectName).dll $(ECO_SERVER_PATH)\Mods&#xD;&#xA;copy bin\$(Configuration)\net8.0\$(MSBuildProjectName).pdb $(ECO_SERVER_PATH)\Mods" />
 	</Target>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -1,6 +1,10 @@
 ﻿using Eco.Core.Systems;
+using Eco.Gameplay.Civics.Demographics;
 using Eco.Gameplay.Civics.Laws;
+using Eco.Gameplay.Economy;
+using Eco.Gameplay.Settlements;
 using Eco.Mods.LawfulMod.CivicsImpExp;
+using Eco.Shared.Utils;
 using LawfulMod.Data;
 using LawfulMod.Util;
 using LiteDB;
@@ -117,11 +121,15 @@ namespace LawfulMod.API
             return Ok(references.ToArray());
         }
 
+        private Type ResolveType(string typeName)
+            => ReflectionUtils.GetTypeFromFullName(typeName);
+
         private ReferenceDto GetReference(JObject data)
         {
             var type = data["type"]?.ToString() ?? "No Type";
             var name = data["name"]?.ToString() ?? "No Name";
-            var possibleValues = Registrars.GetByDerivedTypeOrDefault(type)?.All().Select(o => o.Name).ToArray() ?? new string[0];
+            var resolvedType = ResolveType(type);
+            var possibleValues = Registrars.GetByDerivedTypeOrDefault(resolvedType)?.All().Select(o => o.Name).ToArray() ?? new string[0];
             return new ReferenceDto(type, name, possibleValues);
         }
 

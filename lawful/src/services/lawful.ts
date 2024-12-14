@@ -2,13 +2,31 @@
 import axios from 'axios';
 import { ref } from 'vue';
 
-const getHeadersFromStorage = () => {
-    const worldTicket = localStorage.getItem("worldTicket");
-    if (!worldTicket) return {};
-    return {
-        'X-Auth-Token': worldTicket,
+const getHeadersFromStorage: () =>
+    | {}
+    | {
+    'X-Auth-Token': string;
+} = () => {
+    const rawStorage = localStorage.getItem('worldTicketData');
+    console.log(rawStorage);
+    if (rawStorage === '' || rawStorage === null) {
+        return {};
     }
-}
+
+    try {
+        const worldTicketData: { worldTicket: string; expiration: number } = JSON.parse(rawStorage)
+        console.log(worldTicketData);
+        if (worldTicketData.worldTicket) {
+            return {
+                'X-Auth-Token': worldTicketData.worldTicket,
+            };
+        }
+        return {};
+    } catch (e) {
+        return {};
+    }
+};
+
 
 export const fetchLaws = async () => {
     const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() });
@@ -56,3 +74,14 @@ export const sectionJson = async (sectionId: number) => {
     return response.data;
 }
 
+// Define the ReferenceDto interface
+export interface ReferenceDto {
+    Type: string;
+    Name: string;
+    possibleValues: string[];
+}
+
+export const fetchReferences = async (sectionId: number): Promise<ReferenceDto[]> => {
+    const response = await axios.get(`/api/v1/lawful/section/${sectionId}/references`, { headers: getHeadersFromStorage() });
+    return response.data; // Ensure this matches the ReferenceDto structure
+}
