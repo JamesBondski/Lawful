@@ -6,34 +6,7 @@ import SectionCard from './components/SectionCard.vue';
 import StoredSectionCard from './components/StoredSectionCard.vue';
 import ImportSectionDialog from './components/ImportSectionDialog.vue'; // Import the new dialog component
 import useClipboard from 'vue-clipboard3'
-
-interface LawDto {
-  Id: number;
-  Title: string;
-  Description: string;
-  Creator: string;
-  State: string;
-  Settlement: string;
-  HostObject: string;
-}
-
-interface SectionDto {
-  LawId: number;
-  Index: number;
-  Title: string;
-  Description: string;
-  UserDescription: string;
-  CanStore: boolean; // Added CanStore field
-}
-
-interface StoredSectionDto {
-  Id: number;
-  Title: string;
-  Description: string;
-  UserDescription: string;
-  CanImport: boolean; // Added CanImport field
-  CanDelete: boolean; // Added CanDelete field
-}
+import type { LawDto, SectionDto, StoredSectionDto, ReferenceDto } from '@/services/dto';
 
 const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)

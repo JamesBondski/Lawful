@@ -1,6 +1,7 @@
 // lawful/src/api.ts
 import axios from 'axios';
 import { ref } from 'vue';
+import type { ReferenceDto } from './dto';
 
 const getHeadersFromStorage: () =>
     | {}
@@ -72,13 +73,6 @@ export const sectionJson = async (sectionId: number) => {
         headers: getHeadersFromStorage()
     });
     return response.data;
-}
-
-// Define the ReferenceDto interface
-export interface ReferenceDto {
-    Type: string;
-    Name: string;
-    possibleValues: string[];
 }
 
 export const fetchReferences = async (sectionId: number): Promise<ReferenceDto[]> => {

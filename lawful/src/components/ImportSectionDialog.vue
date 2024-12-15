@@ -30,8 +30,8 @@
 
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, watch } from 'vue';
-import { fetchReferences } from '@/services/lawful'; // Import the function
-import type { ReferenceDto } from '@/services/lawful'; // Type-only import for ReferenceDto
+import { fetchReferences } from '@/services/lawful';
+import type { ReferenceDto } from '@/services/dto';
 
 const props = defineProps<{
   isVisible: boolean;
