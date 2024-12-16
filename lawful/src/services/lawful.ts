@@ -9,14 +9,12 @@ const getHeadersFromStorage: () =>
     'X-Auth-Token': string;
 } = () => {
     const rawStorage = localStorage.getItem('worldTicketData');
-    console.log(rawStorage);
     if (rawStorage === '' || rawStorage === null) {
         return {};
     }
 
     try {
         const worldTicketData: { worldTicket: string; expiration: number } = JSON.parse(rawStorage)
-        console.log(worldTicketData);
         if (worldTicketData.worldTicket) {
             return {
                 'X-Auth-Token': worldTicketData.worldTicket,

@@ -79,7 +79,7 @@ const importSection = async (sectionId: number) => {
 
 const deleteStoredSection = async (sectionId: number) => {
   try {
-    await deleteStoredSection(sectionId); // Use the new API method
+    await lawful.deleteStoredSection(sectionId); // Use the new API method
     showAlert('Section deleted successfully', 'success'); // Show success alert
     fetchStoredSections(selectedLawId.value || 0); // Refresh stored sections
   } catch {
@@ -96,12 +96,14 @@ const sectionJson = async (sectionId: number) => {
   }
 }
 
-watch(selectedLawId, (newId) => {
-  if (newId) {
-    fetchSections(newId)
-    fetchStoredSections(newId)
-  } else {
-    sections.value = []
+watch(selectedLawId, (newId, oldId) => {
+  if (newId !== oldId) {
+    if (newId) {
+      fetchSections(newId);
+    } else {
+      sections.value = [];
+    }
+    fetchStoredSections(newId || 0);
   }
 })
 </script>
@@ -138,7 +140,7 @@ watch(selectedLawId, (newId) => {
             :key="section.Id" 
             :section="section" 
             :importSection="importSection" 
-            :deleteSection="() => deleteStoredSection(section.Id)"
+            :deleteSection="deleteStoredSection"
             :sectionJson="sectionJson"
           />
         </div>
@@ -152,7 +154,7 @@ watch(selectedLawId, (newId) => {
       :sectionId="selectedSectionId ?? 0" 
       @close="dialogVisible = false" 
       @import="importSection" 
-    /> <!-- New dialog component usage -->
+    />
   </v-container>
 </template>
 
