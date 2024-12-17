@@ -76,7 +76,9 @@ namespace LawfulMod.API
             }
 
             var bundle = CivicBundle.LoadFromText(section.JSON);
-            var sectionObj = new ImportContext().DeserialiseGenericObject(bundle.Civics.First().Data, typeof(LawSection));
+            var context = new ImportContext();
+            references?.ToList().ForEach(r => context.ReferenceNameMap.Add((r.Type, r.Name), r.MappedName));
+            var sectionObj = context.DeserialiseGenericObject(bundle.Civics.First().Data, typeof(LawSection));
             law.Sections.Add((LawSection)sectionObj);
             return Ok("");
         }

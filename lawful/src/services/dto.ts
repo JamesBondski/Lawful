@@ -29,6 +29,6 @@ export interface StoredSectionDto {
 export interface ReferenceDto {
     Type: string;
     Name: string;
-    possibleValues: string[];
-    selectedValue?: string;
+    PossibleValues: string[];
+    MappedName?: string;
 }

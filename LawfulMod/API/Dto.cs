@@ -1,6 +1,6 @@
 namespace LawfulMod.API
 {
-    public record ReferenceDto(string Type, string Name, string[] possibleValues);
+    public record ReferenceDto(string Type, string Name, string[] PossibleValues, string? MappedName);
 
     public record LawDto(int Id, string Title, string Description, string Creator, String State, string Settlement, string? HostObject);
 

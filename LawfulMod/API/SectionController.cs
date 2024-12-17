@@ -126,8 +126,10 @@ namespace LawfulMod.API
             var type = data["type"]?.ToString() ?? "No Type";
             var name = data["name"]?.ToString() ?? "No Name";
             var resolvedType = ResolveType(type);
-            var possibleValues = Registrars.GetByDerivedTypeOrDefault(resolvedType)?.All().Select(o => o.Name).ToArray() ?? new string[0];
-            return new ReferenceDto(type, name, possibleValues);
+            var registrar = Registrars.GetByDerivedTypeOrDefault(resolvedType);
+            var possibleValues = registrar?.All().Select(o => o.Name).ToArray() ?? new string[0];
+            var mappedName = registrar.GetByName(name);
+            return new ReferenceDto(type, name, possibleValues, mappedName?.Name);
         }
 
         private IEnumerable<JObject> FindReferences(JObject data) => data.DescendantsAndSelf()
