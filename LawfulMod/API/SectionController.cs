@@ -117,6 +117,7 @@ namespace LawfulMod.API
             var references = FindReferences(JObject.Parse(section.JSON))
                 // This Where statement should not be necessary but better safe than sorry.
                 .Where(r => r.ContainsKey("type") && r.ContainsKey("name"))
+                .DistinctBy(r => r["type"].ToString() + r["name"].ToString())
                 .Select(r => GetReference(r));
             return Ok(references.ToArray());
         }
