@@ -13,8 +13,6 @@ namespace LawfulMod.API
     [Route("api/v1/lawful/law")]
     public class LawController : BaseController
     {
-        public record LawDto(int Id, string Title, string Description, string Creator, String State, string Settlement, string? HostObject);
-
         [HttpGet]
         [AllowAnonymous]
         public LawDto[] GetLaws()
@@ -43,8 +41,6 @@ namespace LawfulMod.API
             return new LawDto(law.Id, law.Name, law.UserDescription, law.Creator.Name, law.State.ToString(), law.Settlement.Name, law.HostObject.Object?.Name);
         }
 
-        public record LawSectionDto(int LawId, int Index, string Title, string Description, string UserDescription, bool CanStore);
-
         [HttpGet("{lawId}/sections")]
         public LawSectionDto[] GetSection(int lawId)
         {
@@ -60,7 +56,7 @@ namespace LawfulMod.API
         }
 
         [HttpPost("{lawId}/sections/import/{sectionId}")]
-        public IActionResult ImportSection(int lawId, int sectionId)
+        public IActionResult ImportSection(int lawId, int sectionId, [FromBody]ReferenceDto[]? references)
         {
             var section = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindById(sectionId);
             if (section == null)

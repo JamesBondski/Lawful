@@ -1,4 +1,3 @@
-
 export interface LawDto {
     Id: number;
     Title: string;
@@ -31,4 +30,5 @@ export interface ReferenceDto {
     Type: string;
     Name: string;
     possibleValues: string[];
+    selectedValue?: string;
 }

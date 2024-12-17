@@ -53,8 +53,6 @@ namespace LawfulMod.API
             }
         }
 
-        public record SectionDto(int Id, string Title, string Description, string UserDescription, bool CanImport, bool CanDelete);
-
         [HttpGet]
         [AllowAnonymous]
         public SectionDto[] GetSections(int selectedLawId = 0)
@@ -102,8 +100,6 @@ namespace LawfulMod.API
 
             return Ok(section.JSON);
         }
-
-        public record ReferenceDto(string Type, string Name, string[] possibleValues);
 
         [HttpGet("{id}/references")]
         public IActionResult GetReferences(int id)

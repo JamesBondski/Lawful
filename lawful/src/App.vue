@@ -153,7 +153,7 @@ watch(selectedLawId, (newId, oldId) => {
       :lawId="selectedLawId ?? 0" 
       :sectionId="selectedSectionId ?? 0" 
       @close="dialogVisible = false" 
-      @import="importSection" 
+      @import="lawful.importSection" 
     />
   </v-container>
 </template>

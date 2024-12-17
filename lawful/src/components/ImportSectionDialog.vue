@@ -11,10 +11,10 @@
         <p>Section ID: {{ sectionId }}</p>
         <v-list>
           <v-list-item-group>
-            <v-list-item v-for="reference in references" :key="reference.Name">
+            <v-list-item v-for="reference in modifiedReferences" :key="reference.Name">
               <v-list-item-content>
                 <v-list-item-title>{{ reference.Name }} ({{ reference.Type }})</v-list-item-title>
-                <v-autocomplete :items="reference.possibleValues" label="Possible Values" />
+                <v-autocomplete v-model="reference.selectedValue" :items="reference.possibleValues" label="Possible Values" />
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -42,6 +42,7 @@ const props = defineProps<{
 const emit = defineEmits(['close', 'import']);
 
 const references = ref<ReferenceDto[]>([]); // Use the ReferenceDto type
+const modifiedReferences = ref<ReferenceDto[]>([]); // Local state for modified references
 
 const fetchReferenceData = async () => {
     try {
@@ -60,12 +61,20 @@ watch(() => props.sectionId, (newSectionId) => {
     fetchReferenceData(); // Fetch references when sectionId changes
 });
 
+watch(references, (newReferences) => {
+    modifiedReferences.value = newReferences.map(reference => ({
+        ...reference,
+        possibleValues: [...reference.possibleValues] // Initialize with possible values
+    }));
+});
+
 const closeDialog = () => {
   emit('close');
 };
 
 const confirmImport = () => {
-  emit('import', { lawId: props.lawId, sectionId: props.sectionId });
+  const referencesToSend = modifiedReferences.value.map(({ possibleValues, ...rest }) => rest); // Omit possibleValues
+  emit('import', { lawId: props.lawId, sectionId: props.sectionId, references: referencesToSend }); // Pass modified references array without possibleValues
   closeDialog();
 };
 </script>
