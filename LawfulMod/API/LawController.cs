@@ -2,6 +2,7 @@
 using Eco.Gameplay.Civics.Laws;
 using Eco.Gameplay.Civics.Misc;
 using Eco.Mods.LawfulMod.CivicsImpExp;
+using Eco.Shared.Items;
 using LawfulMod.Data;
 using LawfulMod.Util;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ namespace LawfulMod.API
         [AllowAnonymous]
         public LawDto[] GetLaws()
         {
-            var laws = Registrars.Get<Law>().Where(l => l.Active());
+            var laws = Registrars.Get<Law>().Where(l => l.State == ProposableState.Active || l.State == ProposableState.Draft);
             return laws.Select(l => GetDto(l)).ToArray();
         }
 
