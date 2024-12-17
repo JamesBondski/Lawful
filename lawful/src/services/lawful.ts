@@ -53,11 +53,8 @@ export const fetchStoredSections = async (lawId: number) => {
     return response.data;
 }
 
-export const importSection = async (params: { lawId: number, sectionId: number, references: ReferenceDto[] | null }) => {
-    console.log(params.lawId);
-    console.log(params.sectionId);
-    console.log(params.references);
-    const response = await axios.post(`/api/v1/lawful/law/${params.lawId}/sections/import/${params.sectionId}`, params.references, {
+export const importSection = async ( lawId: number, sectionId: number, references: ReferenceDto[] | null) => {
+    const response = await axios.post(`/api/v1/lawful/law/${lawId}/sections/import/${sectionId}`, references, {
         headers: getHeadersFromStorage()
     });
     return response.data;

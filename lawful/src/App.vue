@@ -96,6 +96,16 @@ const sectionJson = async (sectionId: number) => {
   }
 }
 
+const doImportSection = async (params: { lawId: number, sectionId: number, references: ReferenceDto[] | null }) => {
+  try {
+    await lawful.importSection(params.lawId, params.sectionId, params.references);
+    showAlert('Section imported successfully', 'success'); // Show success alert
+    await fetchSections(params.lawId);
+  } catch {
+    showAlert('Error importing section', 'error'); // Show error alert
+  }
+}
+
 watch(selectedLawId, (newId, oldId) => {
   if (newId !== oldId) {
     if (newId) {
