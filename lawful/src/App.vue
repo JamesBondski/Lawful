@@ -116,10 +116,26 @@ watch(selectedLawId, (newId, oldId) => {
     fetchStoredSections(newId || 0);
   }
 })
+
+const isAdmin = ref(false);
+
+const refreshData = async () => {
+  laws.value = await lawful.fetchLaws(); 
+  await fetchStoredSections(selectedLawId.value || 0);
+  if (selectedLawId.value) {
+    await fetchSections(selectedLawId.value);
+  }
+}
 </script>
 
 <template>
   <v-container>
+    <v-toolbar>
+      <v-btn @click="refreshData" color="primary">Refresh</v-btn>
+      <v-spacer></v-spacer>
+      <v-switch v-model="isAdmin" label="Admin Mode" hide-details="auto" id="admin-switch"></v-switch>
+    </v-toolbar>
+    
     <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert>
     <v-row>
       <v-col cols="6">
@@ -142,7 +158,6 @@ watch(selectedLawId, (newId, oldId) => {
       </v-col>
       <v-col cols="6">
         <h1>Stored Sections</h1>
-        <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn>
         
         <div v-if="storedSections.length > 0">
           <StoredSectionCard 
@@ -169,5 +184,12 @@ watch(selectedLawId, (newId, oldId) => {
 </template>
 
 <style scoped>
+  .toolbar {
+    display: flex;
+    align-items: center;
+  }
 
+  #admin-switch {
+    padding-right: 10px;
+  }
 </style>
