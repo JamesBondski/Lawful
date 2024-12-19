@@ -32,3 +32,8 @@ export interface ReferenceDto {
     PossibleValues: string[];
     MappedName?: string;
 }
+
+export interface UserDto {
+    IsAdmin: boolean; // Indicates if the user is an admin
+    Settlements: string[]; // Array of settlements the user is associated with
+}

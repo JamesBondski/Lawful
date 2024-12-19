@@ -6,7 +6,7 @@ import SectionCard from './components/SectionCard.vue';
 import StoredSectionCard from './components/StoredSectionCard.vue';
 import ImportSectionDialog from './components/ImportSectionDialog.vue'; // Import the new dialog component
 import useClipboard from 'vue-clipboard3'
-import type { LawDto, SectionDto, StoredSectionDto, ReferenceDto } from '@/services/dto';
+import type { LawDto, SectionDto, StoredSectionDto, ReferenceDto, UserDto } from '@/services/dto';
 
 const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
@@ -33,10 +33,20 @@ const openImportDialog = (sectionId: number) => {
     dialogVisible.value = true; // Open the dialog
 }
 
+const isAdmin = ref(false); // Variable to check if the user is an admin
+const adminMode = ref(false); // New variable for admin mode toggle
+
 onMounted(async () => {
   try {
     laws.value = await lawful.fetchLaws(); // Use the new API method
     await lawful.fetchStoredSections(0); // Fetch stored sections on mount
+
+    // Fetch user data to check admin status
+    const userResponse = await fetch('/api/v1/lawful/user');
+    if (userResponse.ok) {
+      const userData: UserDto = await userResponse.json();
+      isAdmin.value = userData.IsAdmin; // Set isAdmin based on user data
+    }
   } catch {
     showAlert('Error fetching laws', 'error'); // Show error alert
   }
@@ -117,8 +127,6 @@ watch(selectedLawId, (newId, oldId) => {
   }
 })
 
-const isAdmin = ref(false);
-
 const refreshData = async () => {
   laws.value = await lawful.fetchLaws(); 
   await fetchStoredSections(selectedLawId.value || 0);
@@ -133,7 +141,7 @@ const refreshData = async () => {
     <v-toolbar>
       <v-btn @click="refreshData" color="primary">Refresh</v-btn>
       <v-spacer></v-spacer>
-      <v-switch v-model="isAdmin" label="Admin Mode" hide-details="auto" id="admin-switch"></v-switch>
+      <v-switch v-if="isAdmin" v-model="adminMode" label="Admin Mode" hide-details="auto" id="admin-switch"></v-switch>
     </v-toolbar>
     
     <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert>
