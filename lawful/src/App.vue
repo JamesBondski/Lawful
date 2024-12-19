@@ -72,7 +72,7 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
 
 const fetchStoredSections = async (lawId: number) => {
   try {
-    storedSections.value = await lawful.fetchStoredSections(lawId); // Use the new API method
+    storedSections.value = await lawful.fetchStoredSections(lawId);
   } catch (error) {
     console.error('Error fetching stored sections:', error)
   }
