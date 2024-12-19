@@ -1,7 +1,7 @@
 // lawful/src/api.ts
 import axios from 'axios';
 import { ref } from 'vue';
-import type { ReferenceDto } from './dto';
+import type { ReferenceDto, UserDto } from './dto';
 
 const getHeadersFromStorage: () =>
     | {}
@@ -26,14 +26,23 @@ const getHeadersFromStorage: () =>
     }
 };
 
+export const fetchUser = async () => {
+    // Fetch user data
+    const userResponse = await axios.get('/api/v1/lawful/user', { headers: getHeadersFromStorage() });
+    if (userResponse.status === 200) {
+      const userData: UserDto = userResponse.data;
+      return userData;
+    }
+    return null;
+}
 
 export const fetchLaws = async () => {
     const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() });
     return response.data;
 }
 
-export const fetchSections = async (id: string | number) => {
-    const response = await axios.get(`/api/v1/lawful/law/${id}/sections`, { headers: getHeadersFromStorage() });
+export const fetchSections = async (id: string | number, adminMode: boolean | null) => {
+    const response = await axios.get(`/api/v1/lawful/law/${id}/sections`, { headers: getHeadersFromStorage(), params: { adminMode } });
     return response.data;
 }
 

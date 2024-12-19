@@ -1,6 +1,5 @@
-// LawfulMod/API/UserController.cs
 using Microsoft.AspNetCore.Mvc;
-using LawfulMod.Data; // Ensure this namespace contains UserDto
+using Microsoft.AspNetCore.Authorization;
 
 namespace LawfulMod.API
 {
@@ -8,6 +7,7 @@ namespace LawfulMod.API
     public class UserController : BaseController
     {
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult<UserDto> GetUser()
         {
             if (ContextUser == null)
