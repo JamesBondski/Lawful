@@ -6,7 +6,7 @@ import SectionCard from './components/SectionCard.vue';
 import StoredSectionCard from './components/StoredSectionCard.vue';
 import ImportSectionDialog from './components/ImportSectionDialog.vue'; // Import the new dialog component
 import useClipboard from 'vue-clipboard3'
-import type { LawDto, SectionDto, StoredSectionDto, ReferenceDto } from '@/services/dto';
+import type { LawDto, SectionDto, StoredSectionDto, ReferenceDto, UserDto } from '@/services/dto';
 
 const laws = ref<LawDto[]>([])
 const selectedLawId = ref<number | null>(null)
@@ -18,25 +18,34 @@ const alertMessage = ref<string | null>(null) // New reactive variable for alert
 const alertType = ref<'success' | 'error' | null>(null) // New reactive variable for alert type
 
 const showAlert = (message: string, type: 'success' | 'error') => {
-    alertMessage.value = message;
-    alertType.value = type;
-    setTimeout(() => {
-        alertMessage.value = null; // Clear alert after a timeout
-    }, 3000); // Adjust timeout duration as needed
+  alertMessage.value = message;
+  alertType.value = type;
+  setTimeout(() => {
+    alertMessage.value = null; // Clear alert after a timeout
+  }, 3000); // Adjust timeout duration as needed
 }
 
 const dialogVisible = ref(false); // New reactive variable for dialog visibility
 const selectedSectionId = ref<number | null>(null); // New reactive variable for selected section ID
 
 const openImportDialog = (sectionId: number) => {
-    selectedSectionId.value = sectionId; // Set the selected section ID
-    dialogVisible.value = true; // Open the dialog
+  selectedSectionId.value = sectionId; // Set the selected section ID
+  dialogVisible.value = true; // Open the dialog
 }
+
+const isAdmin = ref(false); // Variable to check if the user is an admin
+const adminMode = ref(false); // New variable for admin mode toggle
 
 onMounted(async () => {
   try {
-    laws.value = await lawful.fetchLaws(); // Use the new API method
-    await lawful.fetchStoredSections(0); // Fetch stored sections on mount
+    laws.value = await lawful.fetchLaws();
+    await lawful.fetchStoredSections(0, adminMode.value); // Fetch stored sections on mount
+
+    var user = await lawful.fetchUser();
+    if (user) {
+      isAdmin.value = user.IsAdmin;
+    }
+
   } catch {
     showAlert('Error fetching laws', 'error'); // Show error alert
   }
@@ -44,7 +53,7 @@ onMounted(async () => {
 
 const fetchSections = async (id: string | number) => {
   try {
-    sections.value = await lawful.fetchSections(id); // Use the new API method
+    sections.value = await lawful.fetchSections(id, adminMode.value); // Use the new API method
   } catch (error) {
     showAlert('Error fetching sections:', 'error');
     sections.value = []
@@ -63,7 +72,7 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
 
 const fetchStoredSections = async (lawId: number) => {
   try {
-    storedSections.value = await lawful.fetchStoredSections(lawId); // Use the new API method
+    storedSections.value = await lawful.fetchStoredSections(lawId, adminMode.value);
   } catch (error) {
     console.error('Error fetching stored sections:', error)
   }
@@ -116,10 +125,34 @@ watch(selectedLawId, (newId, oldId) => {
     fetchStoredSections(newId || 0);
   }
 })
+
+const refreshData = async () => {
+  // Fetch user data to check admin status
+  var user = await lawful.fetchUser();
+  if (user) {
+    isAdmin.value = user.IsAdmin;
+  }
+  
+  laws.value = await lawful.fetchLaws();
+  await fetchStoredSections(selectedLawId.value || 0);
+  if (selectedLawId.value) {
+    await fetchSections(selectedLawId.value);
+  }
+}
+
+watch(adminMode, async (newMode) => {
+  await refreshData(); // Refresh data when admin mode is toggled
+});
 </script>
 
 <template>
   <v-container>
+    <v-toolbar>
+      <v-btn @click="refreshData" color="primary">Refresh</v-btn>
+      <v-spacer></v-spacer>
+      <v-switch v-if="isAdmin" v-model="adminMode" label="Admin Mode" hide-details="auto" id="admin-switch"></v-switch>
+    </v-toolbar>
+
     <v-alert v-if="alertMessage" :type="alertType ?? 'info'" dismissible>{{ alertMessage }}</v-alert>
     <v-row>
       <v-col cols="6">
@@ -130,44 +163,35 @@ watch(selectedLawId, (newId, oldId) => {
 
         <div v-if="sections.length > 0">
           <h2>Sections:</h2>
-          <SectionCard 
-            v-for="(section, index) in sections" 
-            :key="index" 
-            :section="section" 
-            :storeSection="() => storeSection(Number(selectedLawId), section.Index)" 
-          />
+          <SectionCard v-for="(section, index) in sections" :key="index" :section="section"
+            :storeSection="() => storeSection(Number(selectedLawId), section.Index)" />
         </div>
         <p v-else-if="selectedLawId">Loading sections...</p>
         <p v-else>Select a law to view its sections</p>
       </v-col>
       <v-col cols="6">
         <h1>Stored Sections</h1>
-        <v-btn @click="fetchStoredSections" color="primary" class="mb-2">Refresh List</v-btn>
-        
+
         <div v-if="storedSections.length > 0">
-          <StoredSectionCard 
-            v-for="(section, index) in storedSections" 
-            :key="section.Id" 
-            :section="section" 
-            :importSection="importSection" 
-            :deleteSection="deleteStoredSection"
-            :sectionJson="sectionJson"
-          />
+          <StoredSectionCard v-for="(section, index) in storedSections" :key="section.Id" :section="section"
+            :importSection="importSection" :deleteSection="deleteStoredSection" :sectionJson="sectionJson" />
         </div>
         <p v-else>No stored sections available</p>
       </v-col>
     </v-row>
 
-    <ImportSectionDialog 
-      :isVisible="dialogVisible" 
-      :lawId="selectedLawId ?? 0" 
-      :sectionId="selectedSectionId ?? 0" 
-      @close="dialogVisible = false" 
-      @import="lawful.importSection" 
-    />
+    <ImportSectionDialog :isVisible="dialogVisible" :lawId="selectedLawId ?? 0" :sectionId="selectedSectionId ?? 0"
+      @close="dialogVisible = false" @import="lawful.importSection" />
   </v-container>
 </template>
 
 <style scoped>
+.toolbar {
+  display: flex;
+  align-items: center;
+}
 
+#admin-switch {
+  padding-right: 10px;
+}
 </style>

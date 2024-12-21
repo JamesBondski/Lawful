@@ -11,20 +11,20 @@ namespace LawfulMod.API
     {
         protected User? ContextUser => (HttpContext.User.Identity as EcoUserIdentity)?.User;
 
-        protected bool CanStore(int lawId, int sectionIndex)
+        protected bool CanStore(int lawId, int sectionIndex, bool? adminMode = false)
         {
-            if (this.ContextUser != null && this.ContextUser.IsAdmin)
+            if (this.ContextUser != null && adminMode == true && this.ContextUser.IsAdmin)
             {
                 return true;
             }
             return false;
         }
 
-        protected bool CanImport(Law? law, SectionDocument? storedSection)
+        protected bool CanImport(Law? law, SectionDocument? storedSection, bool? adminMode = false)
         {
             if (this.ContextUser != null && law != null && storedSection != null)
             {
-                if ((law.State == ProposableState.Draft && this.ContextUser.AllCitizenships.Any(c => c == law.Settlement)) || this.ContextUser.IsAdmin)
+                if ((law.State == ProposableState.Draft && this.ContextUser.AllCitizenships.Any(c => c == law.Settlement)) || (this.ContextUser.IsAdmin && adminMode == true))
                 {
                     return true;
                 }
@@ -33,9 +33,9 @@ namespace LawfulMod.API
             return false;
         }
 
-        protected bool CanDelete(SectionDocument? storedSection)
+        protected bool CanDelete(SectionDocument? storedSection, bool? adminMode = null)
         {
-            if (this.ContextUser != null && storedSection != null)
+            if (this.ContextUser != null && storedSection != null && adminMode == true)
             {
                 return this.ContextUser.IsAdmin;
             }

@@ -1,7 +1,7 @@
 // lawful/src/api.ts
 import axios from 'axios';
 import { ref } from 'vue';
-import type { ReferenceDto } from './dto';
+import type { LawDto, ReferenceDto, SectionDto, UserDto, StoredSectionDto } from './dto';
 
 const getHeadersFromStorage: () =>
     | {}
@@ -26,18 +26,27 @@ const getHeadersFromStorage: () =>
     }
 };
 
+export const fetchUser = async (): Promise<UserDto | null> => {
+    // Fetch user data
+    const userResponse = await axios.get('/api/v1/lawful/user', { headers: getHeadersFromStorage() });
+    if (userResponse.status === 200) {
+      const userData: UserDto = userResponse.data;
+      return userData;
+    }
+    return null;
+}
 
-export const fetchLaws = async () => {
+export const fetchLaws = async (): Promise<LawDto[]> => {
     const response = await axios.get('/api/v1/lawful/law', { headers: getHeadersFromStorage() });
     return response.data;
 }
 
-export const fetchSections = async (id: string | number) => {
-    const response = await axios.get(`/api/v1/lawful/law/${id}/sections`, { headers: getHeadersFromStorage() });
+export const fetchSections = async (id: string | number, adminMode: boolean | null): Promise<SectionDto[]> => {
+    const response = await axios.get(`/api/v1/lawful/law/${id}/sections`, { headers: getHeadersFromStorage(), params: { adminMode } });
     return response.data;
 }
 
-export const storeSection = async (lawId: number, sectionIndex: number) => {
+export const storeSection = async (lawId: number, sectionIndex: number): Promise<SectionDto> => {
     const response = await axios.post('/api/v1/lawful/section', null, {
         params: { lawId, sectionIndex },
         headers: getHeadersFromStorage()
@@ -45,9 +54,9 @@ export const storeSection = async (lawId: number, sectionIndex: number) => {
     return response.data;
 }
 
-export const fetchStoredSections = async (lawId: number) => {
+export const fetchStoredSections = async (lawId: number, adminMode: boolean | null): Promise<StoredSectionDto[]> => {
     const response = await axios.get('/api/v1/lawful/section', {
-        params: { selectedLawId: lawId },
+        params: { selectedLawId: lawId, adminMode },
         headers: getHeadersFromStorage()
     });
     return response.data;
@@ -60,13 +69,13 @@ export const importSection = async ( lawId: number, sectionId: number, reference
     return response.data;
 }
 
-export const deleteStoredSection = async (sectionId: number) => {
+export const deleteStoredSection = async (sectionId: number): Promise<void> => {
     await axios.delete(`/api/v1/lawful/section/${sectionId}`, {
         headers: getHeadersFromStorage()
     });
 }
 
-export const sectionJson = async (sectionId: number) => {
+export const sectionJson = async (sectionId: number): Promise<SectionDto> => {
     const response = await axios.get(`/api/v1/lawful/section/${sectionId}/json`, {
         headers: getHeadersFromStorage()
     });
