@@ -63,8 +63,4 @@
 	  <Exec Command="copy bin\$(Configuration)\net8.0\$(MSBuildProjectName).dll $(ECO_SERVER_PATH)\Mods&#xD;&#xA;copy bin\$(Configuration)\net8.0\$(MSBuildProjectName).pdb $(ECO_SERVER_PATH)\Mods" />
 	</Target>
 
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-	  <Exec Command="prebuild.bat" />
-	</Target>
-
 </Project>

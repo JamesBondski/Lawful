@@ -38,8 +38,8 @@ const adminMode = ref(false); // New variable for admin mode toggle
 
 onMounted(async () => {
   try {
-    laws.value = await lawful.fetchLaws(); // Use the new API method
-    await lawful.fetchStoredSections(0); // Fetch stored sections on mount
+    laws.value = await lawful.fetchLaws();
+    await lawful.fetchStoredSections(0, adminMode.value); // Fetch stored sections on mount
 
     var user = await lawful.fetchUser();
     if (user) {
@@ -72,7 +72,7 @@ const storeSection = async (lawId: number, sectionIndex: number) => {
 
 const fetchStoredSections = async (lawId: number) => {
   try {
-    storedSections.value = await lawful.fetchStoredSections(lawId);
+    storedSections.value = await lawful.fetchStoredSections(lawId, adminMode.value);
   } catch (error) {
     console.error('Error fetching stored sections:', error)
   }
@@ -139,6 +139,10 @@ const refreshData = async () => {
     await fetchSections(selectedLawId.value);
   }
 }
+
+watch(adminMode, async (newMode) => {
+  await refreshData(); // Refresh data when admin mode is toggled
+});
 </script>
 
 <template>

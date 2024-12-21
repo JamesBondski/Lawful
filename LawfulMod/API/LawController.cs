@@ -43,12 +43,12 @@ namespace LawfulMod.API
 
         [HttpGet("{lawId}/sections")]
         [AllowAnonymous]
-        public LawSectionDto[] GetSection(int lawId, bool? adminMode = null)
+        public LawSectionDto[] GetSections(int lawId, bool? adminMode = null)
         {
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                return law.Sections.Select((s, index) => new LawSectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, this.CanStore(lawId, index))).ToArray();
+                return law.Sections.Select((s, index) => new LawSectionDto(law.Id, index, s.Title, TextUtils.StripTags(s.Description()), s.UserDescription, this.CanStore(lawId, index, adminMode))).ToArray();
             }
             else
             {

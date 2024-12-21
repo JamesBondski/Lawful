@@ -54,9 +54,9 @@ export const storeSection = async (lawId: number, sectionIndex: number): Promise
     return response.data;
 }
 
-export const fetchStoredSections = async (lawId: number): Promise<StoredSectionDto[]> => {
+export const fetchStoredSections = async (lawId: number, adminMode: boolean | null): Promise<StoredSectionDto[]> => {
     const response = await axios.get('/api/v1/lawful/section', {
-        params: { selectedLawId: lawId },
+        params: { selectedLawId: lawId, adminMode },
         headers: getHeadersFromStorage()
     });
     return response.data;

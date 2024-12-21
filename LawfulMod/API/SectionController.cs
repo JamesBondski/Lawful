@@ -55,7 +55,7 @@ namespace LawfulMod.API
 
         [HttpGet]
         [AllowAnonymous]
-        public SectionDto[] GetSections(int selectedLawId = 0)
+        public SectionDto[] GetSections(int selectedLawId = 0, bool? adminMode = false)
         {
             var sections = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections").FindAll();
             if (sections == null)
@@ -65,7 +65,7 @@ namespace LawfulMod.API
 
             // We need the law to check if the user can import the section. If it is not a draft, it can not be imported to.
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == selectedLawId);
-            return sections.Select(s => new SectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s), this.CanDelete(s))).ToArray();
+            return sections.Select(s => new SectionDto(s.Id, s.Title, s.Description, s.UserDescription, this.CanImport(law, s, adminMode), this.CanDelete(s, adminMode))).ToArray();
         }
 
         [HttpDelete("{id}")]
