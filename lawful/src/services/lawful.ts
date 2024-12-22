@@ -72,8 +72,9 @@ export const importSection = async (lawId: number, sectionId: number, references
     return response.data;
 }
 
-export const deleteStoredSection = async (sectionId: number): Promise<void> => {
+export const deleteStoredSection = async (sectionId: number, adminMode: boolean | null): Promise<void> => {
     await axios.delete(`/api/v1/lawful/section/${sectionId}`, {
+        params: { adminMode },
         headers: getHeadersFromStorage()
     });
 }

@@ -19,12 +19,12 @@ namespace LawfulMod.API
     public class SectionController : BaseController
     {
         [HttpPost]
-        public IActionResult StoreSection(int lawId, int sectionIndex)
+        public IActionResult StoreSection(int lawId, int sectionIndex, bool? adminMode = false)
         {
             var law = Registrars.Get<Law>().FirstOrDefault(l => l.Id == lawId);
             if (law != null)
             {
-                if (!this.CanStore(lawId, sectionIndex)) // Check if user is authorized to store
+                if (!this.CanStore(lawId, sectionIndex, adminMode)) // Check if user is authorized to store
                 {
                     return StatusCode(403); // Return 403 Forbidden if not authorized
                 }
@@ -69,7 +69,7 @@ namespace LawfulMod.API
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteStoredSection(int id)
+        public IActionResult DeleteStoredSection(int id, bool? adminMode = false)
         {
             var sectionCollection = LawfulPlugin.Obj.Db?.GetCollection<SectionDocument>("sections");
             var section = sectionCollection?.FindById(id);
@@ -80,7 +80,7 @@ namespace LawfulMod.API
                 return NotFound(); // Return 404 Not Found if the section is not found
             }
 
-            if (!this.CanDelete(section))
+            if (!this.CanDelete(section, adminMode))
             {
                 return StatusCode(403); // Return 403 Forbidden if not authorized
             }

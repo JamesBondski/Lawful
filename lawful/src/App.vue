@@ -88,7 +88,7 @@ const importSection = async (sectionId: number) => {
 
 const deleteStoredSection = async (sectionId: number) => {
   try {
-    await lawful.deleteStoredSection(sectionId); // Use the new API method
+    await lawful.deleteStoredSection(sectionId, adminMode.value); // Use the new API method
     showAlert('Section deleted successfully', 'success'); // Show success alert
     fetchStoredSections(selectedLawId.value || 0); // Refresh stored sections
   } catch {
