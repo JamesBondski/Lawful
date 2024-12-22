@@ -1,7 +1,7 @@
 // lawful/src/api.ts
 import axios from 'axios';
 import { ref } from 'vue';
-import type { LawDto, ReferenceDto, SectionDto, UserDto, StoredSectionDto } from './dto';
+import type { LawDto, ReferenceDto, SectionDto, StoredSectionDto, UserDto } from './dto';
 
 const getHeadersFromStorage: () =>
     | {}
@@ -46,9 +46,9 @@ export const fetchSections = async (id: string | number, adminMode: boolean | nu
     return response.data;
 }
 
-export const storeSection = async (lawId: number, sectionIndex: number): Promise<SectionDto> => {
+export const storeSection = async (lawId: number, sectionIndex: number, adminMode: boolean | null): Promise<SectionDto> => {
     const response = await axios.post('/api/v1/lawful/section', null, {
-        params: { lawId, sectionIndex },
+        params: { lawId, sectionIndex, adminMode },
         headers: getHeadersFromStorage()
     });
     return response.data;
@@ -62,8 +62,11 @@ export const fetchStoredSections = async (lawId: number, adminMode: boolean | nu
     return response.data;
 }
 
-export const importSection = async ( lawId: number, sectionId: number, references: ReferenceDto[] | null) => {
-    const response = await axios.post(`/api/v1/lawful/law/${lawId}/sections/import/${sectionId}`, references, {
+export const importSection = async (lawId: number, sectionId: number, references: ReferenceDto[] | null) => {
+    // Remove unnecessary properties from ReferenceDto
+    const filteredReferences = references?.map(({ Type, Name, MappedName }) => ({ Type, Name, MappedName })) || null; // Exclude PossibleValues
+
+    const response = await axios.post(`/api/v1/lawful/law/${lawId}/sections/import/${sectionId}`, filteredReferences, {
         headers: getHeadersFromStorage()
     });
     return response.data;

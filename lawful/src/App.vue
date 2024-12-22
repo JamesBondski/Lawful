@@ -62,7 +62,7 @@ const fetchSections = async (id: string | number) => {
 
 const storeSection = async (lawId: number, sectionIndex: number) => {
   try {
-    await lawful.storeSection(lawId, sectionIndex); // Use the new API method
+    await lawful.storeSection(lawId, sectionIndex, adminMode.value); // Use the new API method
     showAlert('Section stored successfully', 'success'); // Show success alert
     fetchStoredSections(lawId);
   } catch {
@@ -98,7 +98,7 @@ const deleteStoredSection = async (sectionId: number) => {
 
 const sectionJson = async (sectionId: number) => {
   try {
-    const data = await sectionJson(sectionId); // Use the new API method
+    const data = await lawful.sectionJson(sectionId); // Use the new API method
     await clipboard.toClipboard(JSON.stringify(data));
   } catch {
     showAlert('Error fetching JSON', 'error'); // Show error alert
@@ -181,7 +181,7 @@ watch(adminMode, async (newMode) => {
     </v-row>
 
     <ImportSectionDialog :isVisible="dialogVisible" :lawId="selectedLawId ?? 0" :sectionId="selectedSectionId ?? 0"
-      @close="dialogVisible = false" @import="lawful.importSection" />
+      @close="dialogVisible = false" @import="doImportSection" />
   </v-container>
 </template>
 
